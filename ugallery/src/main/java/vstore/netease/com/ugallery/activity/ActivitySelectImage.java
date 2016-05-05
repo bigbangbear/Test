@@ -3,6 +3,7 @@ package vstore.netease.com.ugallery.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -77,7 +80,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_image);
         mContext = this;
-
+        initFresco();
         initView();
     }
 
@@ -201,7 +204,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         linearLayoutBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+
             }
         });
         getPhotos();
@@ -271,4 +274,12 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
             }
         }
     };
+
+    private void initFresco(){
+
+        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
+                .setBitmapsConfig( Bitmap.Config.RGB_565)
+                .build();
+        Fresco.initialize(this, imagePipelineConfig);
+    }
 }

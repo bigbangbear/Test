@@ -4,19 +4,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.huibin.yu.imageselect.R;
-import com.huibin.yu.imageselect.listener.OnSelectImageResultCallback;
-import com.huibin.yu.imageselect.model.PhotoInfo;
+import com.yalantis.ucrop.view.GestureCropImageView;
 
 import java.util.List;
+
+import vstore.netease.com.ugallery.activity.ActivitySelectImage;
+import vstore.netease.com.ugallery.listener.OnSelectImageResultCallback;
+import vstore.netease.com.ugallery.model.PhotoInfo;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView openSingleImage;
-    private ImageView mImage;
+    private GestureCropImageView mImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,16 +32,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mImage = (ImageView) findViewById(R.id.image);
+        mImage = (GestureCropImageView) findViewById(R.id.image);
     }
 
-    private class SelectImageResult implements OnSelectImageResultCallback{
+    private class SelectImageResult implements OnSelectImageResultCallback {
         @Override
         public void onHanlderSuccess(int reqeustCode, List<PhotoInfo> resultList) {
            // mImage.loadImageFilePath(resultList.get(0).getPhotoPath());
-            mImage.setImageURI(Uri.parse(resultList.get(0).getPhotoPath()));
-            mImage.invalidate();
-            mImage.postInvalidate();
+            Uri uri = Uri.parse("file://"+resultList.get(0).getPhotoPath());
+            mImage.setImageUri(uri);
         }
 
         @Override

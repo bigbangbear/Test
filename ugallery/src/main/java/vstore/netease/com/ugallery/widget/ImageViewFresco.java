@@ -74,19 +74,31 @@ public class ImageViewFresco extends SimpleDraweeView{
                 .build();
         setHierarchy(hierarchy);
 
-        DraweeHolder<GenericDraweeHierarchy> draweeHolder = DraweeHolder.create(hierarchy, mContext);
+        mDraweeHolder = DraweeHolder.create(hierarchy, mContext);
 
         ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(uri)
                 .setResizeOptions(new ResizeOptions(width, height))
                 .build();
 
         DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setOldController(draweeHolder.getController())
+                .setOldController(mDraweeHolder.getController())
                 .setImageRequest(imageRequest)
                 .build();
 
-        draweeHolder.setController(controller);
+        mDraweeHolder.setController(controller);
 
+    }
+    private   DraweeHolder<GenericDraweeHierarchy>  mDraweeHolder;
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mDraweeHolder.onDetach();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mDraweeHolder.onAttach();
     }
 }

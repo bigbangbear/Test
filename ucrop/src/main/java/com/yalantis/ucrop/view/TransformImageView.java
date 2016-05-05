@@ -152,6 +152,19 @@ public class TransformImageView extends ImageView {
     }
 
     /**
+     * 作为可缩放平移的Image View使用
+     * @param imageUri
+     */
+    public void setImageUri(@NonNull Uri imageUri){
+        try {
+            setImageUri(imageUri, imageUri);
+        }catch (Exception e){
+
+        }
+
+    }
+
+    /**
      * @return - current image scale value.
      * [1.0f - for original image, 2.0f - for 200% scaled image, etc.]
      */

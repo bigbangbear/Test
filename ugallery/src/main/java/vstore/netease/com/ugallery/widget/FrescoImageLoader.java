@@ -105,15 +105,19 @@ public class FrescoImageLoader implements ImageLoader {
                 .newBuilderWithSource(uri)
                 .setResizeOptions(new ResizeOptions(width, height))//图片目标大小
                 .build();
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
+        mraweeHolder = Fresco.newDraweeControllerBuilder()
                 .setOldController(draweeHolder.getController())
                 .setImageRequest(imageRequest)
                 .build();
-        draweeHolder.setController(controller);
+        draweeHolder.setController(mraweeHolder);
     }
 
+    private DraweeController mraweeHolder;
     @Override
     public void clearMemoryCache() {
 
     }
+
+
+
 }
