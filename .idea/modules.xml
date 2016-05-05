@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/ImageSelect.iml" filepath="$PROJECT_DIR$/ImageSelect.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ucrop/ucrop.iml" filepath="$PROJECT_DIR$/ucrop/ucrop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ugallery/ugallery.iml" filepath="$PROJECT_DIR$/ugallery/ugallery.iml" />
     </modules>
   </component>
 </project>
