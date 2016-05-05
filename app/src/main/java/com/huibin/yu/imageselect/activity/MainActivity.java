@@ -3,6 +3,7 @@ package com.huibin.yu.imageselect.activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -11,7 +12,7 @@ import com.yalantis.ucrop.view.GestureCropImageView;
 
 import java.util.List;
 
-import vstore.netease.com.ugallery.activity.ActivitySelectImage;
+import vstore.netease.com.ugallery.UGallery;
 import vstore.netease.com.ugallery.listener.OnSelectImageResultCallback;
 import vstore.netease.com.ugallery.model.PhotoInfo;
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         openSingleImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivitySelectImage.startActivityForSingleImage(MainActivity.this, new SelectImageResult());
+                UGallery.selectMutipleImage(MainActivity.this, new SelectImageResult());
             }
         });
 
@@ -41,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
            // mImage.loadImageFilePath(resultList.get(0).getPhotoPath());
             Uri uri = Uri.parse("file://"+resultList.get(0).getPhotoPath());
             mImage.setImageUri(uri);
+            for (PhotoInfo info: resultList){
+                Log.i("hzyuhuibin", info.getPhotoPath());
+            }
         }
 
         @Override
