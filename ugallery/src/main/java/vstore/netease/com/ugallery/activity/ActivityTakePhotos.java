@@ -7,8 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import vstore.netease.com.ugallery.UGallery;
 import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
@@ -18,6 +22,7 @@ import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
  * @date 2016-05-05
  */
 public class ActivityTakePhotos extends Activity{
+    private static final String TAG = "ActivityTakePhotos";
     private static OnGalleryImageResultCallback mCallBack;
 
     private Uri mTakePhotoUri = null;
@@ -54,14 +59,18 @@ public class ActivityTakePhotos extends Activity{
 
     private File mTakePhotoFolder = null;
     protected void takePhotoAction() {
-        //mTakePhotoUri = Uri.fromFile(new File(getCacheDir(), "TakeImageTmp.jpg"));
+
         if (mTakePhotoFolder == null){
             mTakePhotoFolder = new File(Environment.getExternalStorageDirectory(), "/DCIM/");
         }
+
+        String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.CHINA).format(new Date(System.currentTimeMillis()));
+
         if (mTakePhotoUri == null){
-            File img = new File(mTakePhotoFolder, "IMG"+ ".jpg");
+            File img = new File(mTakePhotoFolder, fileName+ ".jpg");
             mTakePhotoUri = Uri.fromFile(img);
         }
+        Log.v(TAG,"mTakePhotoUri---"+mTakePhotoUri);
         Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mTakePhotoUri);
         startActivityForResult(captureIntent, UGallery.TAKE_PHOTO_SUCCESS);
