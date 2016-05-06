@@ -18,7 +18,15 @@
         android:text="openSinge"
         />
 
-    <com.yalantis.ucrop.view.GestureCropImageView
+    <TextView
+        android:id="@+id/bt_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试"
+        android:layout_margin="10dp"
+        />
+
+    <vstore.netease.com.ugallery.view.GestureImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

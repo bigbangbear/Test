@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,9 +16,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.yalantis.ucrop.UCrop;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +42,8 @@ import vstore.netease.com.ugallery.utils.PhotoTools;
 public class ActivitySelectImage extends Activity implements  FolderSelectListener, ImageSelectListener {
     //是否单选图片
     public static boolean mIsSingleImagePick ;
-    public static boolean mIsCrop = true;
+    //是否截图
+    //public static boolean mIsCrop = true;
     //设置显示图片的列数
     public static int mImageColumn = 2;
     //设置最多选择几张图片
@@ -77,6 +75,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
     }
+
 
     /**
      * 选择多张照片
@@ -125,17 +124,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mSelectPhoto = (ArrayList<PhotoInfo>) getIntent().getSerializableExtra("selectImages");
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            //剪裁单张图像后，通过回调返回结果
-            final Uri resultUri = UCrop.getOutput(data);
-            mSingleImageCallBack.onHanlderSuccess(UCrop.RESULT_ERROR, resultUri.getPath());
-            finish();
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
-        }
-    }
+
 
     @Override
     public void onFolderSelectListner(int position) {
@@ -152,12 +141,8 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         PhotoInfo info = mAdapterGalleryImages.getFolderInfo().getPhotoList().get(position);
 
         if (mIsSingleImagePick){
-            if (mIsCrop){
-                startCropImage(info.getPhotoPath());
-            }else {
-                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, info.getPhotoPath());
-                finish();
-            }
+                    mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, info.getPhotoPath());
+                    finish();
         }else {
             if (mSelectPhoto.contains(info)){
                 mSelectPhoto.remove(info);
@@ -253,30 +238,9 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mHanlder.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
     }
 
-    /**
-     * 剪裁图片参数配置
-     * @return
-     */
-    private UCrop.Options setCropOption(){
-        UCrop.Options options = new UCrop.Options();
-        options.setHideBottomControls(true);
-        options.setFreeStyleCropEnabled(false);
-        options.setToolbarColor(getResources().getColor(R.color.colorPrimary));
-        return options;
-    }
 
-    /**
-     * 开始剪裁图片
-     * @param path 图片路径
-     */
-    private void startCropImage(String path){
-        Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "SampleCropImage.jpeg"));
-        Uri srcUri = Uri.parse("file://"+path);
-        UCrop.of(srcUri, destinationUri)
-                .withAspectRatio(1, 1)
-                .withOptions(setCropOption())
-                .start((Activity) mContext);
-    }
+
+
 
     private void initFresco(){
         ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)

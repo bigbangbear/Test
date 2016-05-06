@@ -10,6 +10,7 @@
                   android:screenOrientation="portrait"
                   android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".activity.ActivityTakePhotos"/>
+        <activity android:name=".activity.ActivityCropImage"/>
 
     </application>
 
