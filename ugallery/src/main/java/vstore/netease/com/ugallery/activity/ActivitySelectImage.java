@@ -44,7 +44,8 @@ import vstore.netease.com.ugallery.utils.PhotoTools;
  */
 public class ActivitySelectImage extends Activity implements  FolderSelectListener, ImageSelectListener {
     //是否单选图片
-    public static boolean mIsSingleImagePick = true;
+    public static boolean mIsSingleImagePick ;
+    public static boolean mIsCrop = true;
     //设置显示图片的列数
     public static int mImageColumn = 2;
     //设置最多选择几张图片
@@ -151,10 +152,13 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         PhotoInfo info = mAdapterGalleryImages.getFolderInfo().getPhotoList().get(position);
 
         if (mIsSingleImagePick){
-            mSelectPhoto.clear();
-            mSelectPhoto.add(info);
-            startCropImage(info.getPhotoPath());
+            if (mIsCrop){
+                startCropImage(info.getPhotoPath());
             }else {
+                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, info.getPhotoPath());
+                finish();
+            }
+        }else {
             if (mSelectPhoto.contains(info)){
                 mSelectPhoto.remove(info);
             }else {
