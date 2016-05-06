@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         openSingleImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UGallery.selectSingleImage(MainActivity.this, new SelectImageResult());
+                UGallery.takePhoto(MainActivity.this, new SelectImageResult());
             }
         });
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onHanlderSuccess(int reqeustCode, String path) {
-            if (reqeustCode == UGallery.SELECT_SINGLE_PHOTO_SUCCESS){
+            if (reqeustCode == UGallery.TAKE_PHOTO){
                 Uri uri = Uri.parse("file://"+path);
                 //mImage.setImageUri(uri);
 

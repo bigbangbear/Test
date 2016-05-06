@@ -16,10 +16,9 @@ import vstore.netease.com.ugallery.listener.OnGalleryImagesResultCallback;
  */
 public class UGallery {
 
-    public static int TAKE_PHOTO_SUCCESS = 1001;
-    public static int TAKE_PHOTO_FAIL = 1002;
-    public static int SELECT_SINGLE_PHOTO_SUCCESS = 1101;
-    public static int SELECT_SINGLE_PHOTO_FAIL = 1102;
+    public static int TAKE_PHOTO = 1001;
+    public static int SELECT_SINGLE_PHOTO = 1101;
+    public static int SELECT_MUTIL_PHOTO = 1102;
     public static int CROP_IMAGE = 1200;
 
     public static void selectSingleImage(Context context, OnGalleryImageResultCallback callback) {

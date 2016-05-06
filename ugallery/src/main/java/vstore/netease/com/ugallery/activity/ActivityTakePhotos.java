@@ -18,7 +18,8 @@ import vstore.netease.com.ugallery.UGallery;
 import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
 
 /**
- * @author yuhuibin
+ * 拍照的Activity
+ * @author liangbin
  * @date 2016-05-05
  */
 public class ActivityTakePhotos extends Activity{
@@ -40,19 +41,19 @@ public class ActivityTakePhotos extends Activity{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == UGallery.TAKE_PHOTO_SUCCESS) {
+        if (requestCode == UGallery.TAKE_PHOTO) {
             if (resultCode == RESULT_OK && mTakePhotoUri != null) {
                 final String path = mTakePhotoUri.getPath();
                 if (new File(path).exists()) {
-                    mCallBack.onHanlderSuccess(UGallery.TAKE_PHOTO_SUCCESS, path);
+                    mCallBack.onHanlderSuccess(UGallery.TAKE_PHOTO, path);
                     finish();
                 }
                 else {
-                    mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO_FAIL, "take photo fail");
+                    mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO, "take photo fail");
                 }
             }
             else {
-                mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO_FAIL, "take photo fail");
+                mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO, "take photo fail");
             }
         }
     }
@@ -73,6 +74,6 @@ public class ActivityTakePhotos extends Activity{
         Log.v(TAG,"mTakePhotoUri---"+mTakePhotoUri);
         Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mTakePhotoUri);
-        startActivityForResult(captureIntent, UGallery.TAKE_PHOTO_SUCCESS);
+        startActivityForResult(captureIntent, UGallery.TAKE_PHOTO);
     }
 }

@@ -141,7 +141,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         PhotoInfo info = mAdapterGalleryImages.getFolderInfo().getPhotoList().get(position);
 
         if (mIsSingleImagePick){
-                    mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, info.getPhotoPath());
+                    mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO, info.getPhotoPath());
                     finish();
         }else {
             if (mSelectPhoto.contains(info)){
@@ -206,7 +206,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
             @Override
             public void onClick(View view) {
                 if (mSelectPhoto.size() > 0){
-                    mMutilImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, mSelectPhoto);
+                    mMutilImageCallBack.onHanlderSuccess(UGallery.SELECT_MUTIL_PHOTO, mSelectPhoto);
                 }
             }
         });
