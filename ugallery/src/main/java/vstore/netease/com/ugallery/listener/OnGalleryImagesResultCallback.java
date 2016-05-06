@@ -6,12 +6,12 @@ import java.util.List;
 import vstore.netease.com.ugallery.model.PhotoInfo;
 
 /**
- * 选择图片回掉
+ * 选择图片回掉，多张图片
  *
  * @author yuhuibin
  * @date 2016-04-25
  */
-public  interface OnSelectImageResultCallback {
+public  interface OnGalleryImagesResultCallback {
     /**
      * 处理成功
      * @param reqeustCode

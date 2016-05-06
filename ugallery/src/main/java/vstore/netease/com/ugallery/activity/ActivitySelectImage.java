@@ -12,7 +12,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,11 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import vstore.netease.com.ugallery.R;
+import vstore.netease.com.ugallery.UGallery;
 import vstore.netease.com.ugallery.adpter.AdapterGalleryFolder;
 import vstore.netease.com.ugallery.adpter.AdapterGalleryImages;
 import vstore.netease.com.ugallery.listener.FolderSelectListener;
 import vstore.netease.com.ugallery.listener.ImageSelectListener;
-import vstore.netease.com.ugallery.listener.OnSelectImageResultCallback;
+import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
+import vstore.netease.com.ugallery.listener.OnGalleryImagesResultCallback;
 import vstore.netease.com.ugallery.model.PhotoFolderInfo;
 import vstore.netease.com.ugallery.model.PhotoInfo;
 import vstore.netease.com.ugallery.utils.PhotoTools;
@@ -49,7 +50,9 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     //设置最多选择几张图片
     public static int mMaxSelectImage = 2;
 
-    private static OnSelectImageResultCallback mCallBack;
+    //返回结果
+    private static OnGalleryImageResultCallback mSingleImageCallBack;
+    private static OnGalleryImagesResultCallback mMutilImageCallBack;
 
     List<PhotoFolderInfo> mAllFolder = new ArrayList<>();
     ArrayList<PhotoInfo> mSelectPhoto = new ArrayList<>();
@@ -61,15 +64,15 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     private TextView mFolderName;
     private Context mContext;
     private final int HANDLER_REFRESH_LIST_EVENT = 1002;
-    public static void startActivityForSingleImage(Context context, OnSelectImageResultCallback callBack){
-        mCallBack = callBack;
+    public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack){
+        mSingleImageCallBack = callBack;
         mIsSingleImagePick = true;
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
     }
 
-    public static void startActivityForMutilImage(Context context, OnSelectImageResultCallback callBack){
-        mCallBack = callBack;
+    public static void startActivityForMutilImage(Context context, OnGalleryImagesResultCallback callBack){
+        mMutilImageCallBack = callBack;
         mIsSingleImagePick = false;
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
@@ -113,29 +116,14 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            //剪裁单张图像后，通过回调返回结果
             final Uri resultUri = UCrop.getOutput(data);
-            //暂时考虑一张图片的情况
-            mSelectPhoto.get(0).setPhotoPath(resultUri.getPath());
-            mCallBack.onHanlderSuccess(UCrop.RESULT_ERROR, mSelectPhoto);
+            mSingleImageCallBack.onHanlderSuccess(UCrop.RESULT_ERROR, resultUri.getPath());
             finish();
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
         }
     }
-
-    /**
-     * 点击文件夹，改变状态
-     */
-    private void folderStatus(){
-        if (mFolderRecyclerView.getVisibility() == View.VISIBLE){
-            mFolderRecyclerView.setVisibility(View.GONE);
-            mFolderRecyclerView.setFocusable(false);
-        }else {
-            mFolderRecyclerView.setVisibility(View.VISIBLE);
-            mFolderRecyclerView.setFocusable(true);
-        }
-    }
-
 
     @Override
     public void onFolderSelectListner(int position) {
@@ -170,6 +158,19 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mAdapterGalleryImages.notifyItemChanged(position);
     }
 
+    /**
+     * 点击文件夹，改变状态
+     */
+    private void folderStatus(){
+        if (mFolderRecyclerView.getVisibility() == View.VISIBLE){
+            mFolderRecyclerView.setVisibility(View.GONE);
+            mFolderRecyclerView.setFocusable(false);
+        }else {
+            mFolderRecyclerView.setVisibility(View.VISIBLE);
+            mFolderRecyclerView.setFocusable(true);
+        }
+    }
+
     private void initView() {
         //设置图片文件夹
         mFolderRecyclerView = (RecyclerView)findViewById(R.id.recyclerview_folder);
@@ -200,13 +201,18 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mAdapterGalleryImages = new AdapterGalleryImages(mContext, mSelectPhoto, this);
         mImageRecyclerView.setAdapter(mAdapterGalleryImages);
 
-        LinearLayout linearLayoutBottom = (LinearLayout)findViewById(R.id.ly_bottom);
-        linearLayoutBottom.setOnClickListener(new View.OnClickListener() {
+        TextView selectFinish = (TextView)findViewById(R.id.bt_finish);
+        selectFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (mSelectPhoto.size() > 0){
+                    mMutilImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, mSelectPhoto);
+                }
             }
         });
+        if (!mIsSingleImagePick){
+            selectFinish.setVisibility(View.VISIBLE);
+        }
         getPhotos();
     }
 
@@ -257,6 +263,13 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
                 .start((Activity) mContext);
     }
 
+    private void initFresco(){
+        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
+                .setBitmapsConfig( Bitmap.Config.RGB_565)
+                .build();
+        Fresco.initialize(this, imagePipelineConfig);
+    }
+
     private Handler mHanlder = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -274,12 +287,4 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
             }
         }
     };
-
-    private void initFresco(){
-
-        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
-                .setBitmapsConfig( Bitmap.Config.RGB_565)
-                .build();
-        Fresco.initialize(this, imagePipelineConfig);
-    }
 }
