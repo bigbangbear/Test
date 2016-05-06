@@ -64,6 +64,12 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     private TextView mFolderName;
     private Context mContext;
     private final int HANDLER_REFRESH_LIST_EVENT = 1002;
+
+    /**
+     * 选择单张照片
+     * @param context
+     * @param callBack
+     */
     public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack){
         mSingleImageCallBack = callBack;
         mIsSingleImagePick = true;
@@ -71,6 +77,11 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         ( (Activity)context).startActivity(intent);
     }
 
+    /**
+     * 选择多张照片
+     * @param context
+     * @param callBack
+     */
     public static void startActivityForMutilImage(Context context, OnGalleryImagesResultCallback callBack){
         mMutilImageCallBack = callBack;
         mIsSingleImagePick = false;

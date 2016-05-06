@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 
 import java.io.File;
@@ -19,7 +20,7 @@ import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
 public class ActivityTakePhotos extends Activity{
     private static OnGalleryImageResultCallback mCallBack;
 
-    private Uri mTakePhotoUri;
+    private Uri mTakePhotoUri = null;
     public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack){
         mCallBack = callBack;
         Intent intent = new Intent(context, ActivityTakePhotos.class);
@@ -39,6 +40,7 @@ public class ActivityTakePhotos extends Activity{
                 final String path = mTakePhotoUri.getPath();
                 if (new File(path).exists()) {
                     mCallBack.onHanlderSuccess(UGallery.TAKE_PHOTO_SUCCESS, path);
+                    finish();
                 }
                 else {
                     mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO_FAIL, "take photo fail");
@@ -50,9 +52,16 @@ public class ActivityTakePhotos extends Activity{
         }
     }
 
+    private File mTakePhotoFolder = null;
     protected void takePhotoAction() {
-        mTakePhotoUri = Uri.fromFile(new File(getCacheDir(), "TakeImageTmp.jpg"));
-
+        //mTakePhotoUri = Uri.fromFile(new File(getCacheDir(), "TakeImageTmp.jpg"));
+        if (mTakePhotoFolder == null){
+            mTakePhotoFolder = new File(Environment.getExternalStorageDirectory(), "/DCIM/");
+        }
+        if (mTakePhotoUri == null){
+            File img = new File(mTakePhotoFolder, "IMG"+ ".jpg");
+            mTakePhotoUri = Uri.fromFile(img);
+        }
         Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mTakePhotoUri);
         startActivityForResult(captureIntent, UGallery.TAKE_PHOTO_SUCCESS);
