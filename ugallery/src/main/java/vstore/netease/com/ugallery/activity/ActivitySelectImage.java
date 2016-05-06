@@ -47,7 +47,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     public static boolean mIsSingleImagePick ;
     public static boolean mIsCrop = true;
     //设置显示图片的列数
-    public static int mImageColumn = 2;
+    public static int mImageColumn = 3;
     //设置最多选择几张图片
     public static int mMaxSelectImage = 2;
 
