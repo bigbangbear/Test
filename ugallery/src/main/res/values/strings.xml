@@ -2,4 +2,5 @@
     <string name="app_name">ugallery</string>
     <string name="all_photo">所有图像</string>
     <string name="select_finish">下一步</string>
+    <string name="select_preview">预览</string>
 </resources>

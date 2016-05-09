@@ -9,6 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:id="@+id/ly"
     tools:context=".activity.MainActivity">
 
     <TextView
@@ -16,20 +17,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="openSinge"
+        android:text="openSingleImage"
         />
 
     <TextView
-        android:id="@+id/bt_test"
+        android:id="@+id/bt_open_mutil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="测试"
         android:layout_margin="10dp"
+        android:text="openMutiImage"
         />
-
+    <TextView
+        android:id="@+id/bt_open_crop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="cropImage"
+        />
+    
     <vstore.netease.com.ugallery.view.GestureImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
+
+
 </LinearLayout>

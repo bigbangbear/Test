@@ -10,6 +10,7 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:gravity="center_vertical"
+        android:background="@color/selectToolBar"
         >
 
         <TextView
@@ -17,17 +18,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
+            android:padding="10dp"
             />
 
         <TextView
             android:id="@+id/bt_finish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
+            android:layout_alignParentRight="true"
             android:text="@string/select_finish"
             android:visibility="gone"
+            android:padding="10dp"
+            />
+
+        <TextView
+            android:id="@+id/bt_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_preview"
+            android:layout_toLeftOf="@id/bt_finish"
+            android:visibility="gone"
+            android:padding="10dp"
             />
     </RelativeLayout>
 
@@ -38,12 +49,23 @@
         android:layout_above="@id/ly_bottom"
         />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_folder"
+    <LinearLayout
+        android:id="@+id/ly_folder_layer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:visibility="gone"
         android:layout_above="@id/ly_bottom"
-        />
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_folder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            />
+
+    </LinearLayout>
+
 
 
 </RelativeLayout>

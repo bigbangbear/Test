@@ -36,6 +36,8 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
+import vstore.netease.com.ugallery.R;
+
 /**
  * Desction:fresco image loader
  * Author:pengjianbo
@@ -58,12 +60,13 @@ public class FrescoImageLoader implements ImageLoader {
     }
 
     @Override
-    public void displayImage(Activity activity, String path, final  GFImageView imageView, final Drawable defaultDrawable, int width, int height) {
+    public void displayImage(Activity activity, String path, final  GFImageView imageView, int width, int height) {
         Resources resources = context.getResources();
+        Drawable drawable = resources.getDrawable(R.drawable.ic_gf_default_photo);
         GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(resources)
                 .setFadeDuration(300)
-                .setPlaceholderImage(defaultDrawable)
-                .setFailureImage(defaultDrawable)
+                .setPlaceholderImage(drawable)
+                .setFailureImage(drawable)
                 .setProgressBarImage(new ProgressBarDrawable())
                 .build();
 
@@ -91,7 +94,7 @@ public class FrescoImageLoader implements ImageLoader {
             public void onDraw(Canvas canvas) {
                 Drawable drawable = draweeHolder.getHierarchy().getTopLevelDrawable();
                 if (drawable == null) {
-                    imageView.setImageDrawable(defaultDrawable);
+                    imageView.setImageDrawable(drawable);
                 } else {
                     imageView.setImageDrawable(drawable);
                 }

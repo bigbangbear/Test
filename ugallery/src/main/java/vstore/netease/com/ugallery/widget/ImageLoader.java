@@ -1,7 +1,6 @@
 package vstore.netease.com.ugallery.widget;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 
 import java.io.Serializable;
 
@@ -11,6 +10,6 @@ import java.io.Serializable;
  * Date:15/10/10 下午5:27
  */
 public interface ImageLoader extends Serializable {
-    void displayImage(Activity activity, String path, GFImageView imageView, Drawable defaultDrawable, int width, int height);
+    void displayImage(Activity activity, String path, GFImageView imageView,  int width, int height);
     void clearMemoryCache();
 }

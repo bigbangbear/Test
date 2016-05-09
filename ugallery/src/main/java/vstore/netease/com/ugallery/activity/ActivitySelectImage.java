@@ -3,7 +3,6 @@ package vstore.netease.com.ugallery.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,12 +10,14 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,11 +48,12 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     //设置显示图片的列数
     public static int mImageColumn = 3;
     //设置最多选择几张图片
-    public static int mMaxSelectImage = 2;
+    public static int mMaxSelectImage = 9;
 
     //返回结果
     private static OnGalleryImageResultCallback mSingleImageCallBack;
     private static OnGalleryImagesResultCallback mMutilImageCallBack;
+    private static final int HANDLER_REFRESH_LIST_EVENT = 1002;
 
     List<PhotoFolderInfo> mAllFolder = new ArrayList<>();
     ArrayList<PhotoInfo> mSelectPhoto = new ArrayList<>();
@@ -62,7 +64,12 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     private AdapterGalleryImages mAdapterGalleryImages;
     private TextView mFolderName;
     private Context mContext;
-    private final int HANDLER_REFRESH_LIST_EVENT = 1002;
+    private LinearLayout mLinearLayoutFolder;
+
+    private TextView mSelectFinish;
+    private TextView mSelectPreview;
+
+    private ScanImageHandler mHandler;
 
     /**
      * 选择单张照片
@@ -75,7 +82,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
     }
-
 
     /**
      * 选择多张照片
@@ -124,12 +130,10 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mSelectPhoto = (ArrayList<PhotoInfo>) getIntent().getSerializableExtra("selectImages");
     }
 
-
-
     @Override
     public void onFolderSelectListner(int position) {
         mFolderName.setText(mAllFolder.get(position).getFolderName());
-        mFolderRecyclerView.setVisibility(View.GONE);
+        changeFolderStatus();
         mAdapterGalleryImages.setFolderInfo(mAllFolder.get(position));
         mAdapterGalleryImages.notifyDataSetChanged();
     }
@@ -137,7 +141,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     /** 点击图片回调函数，处理单选，复选*/
     @Override
     public void onImageSelectListner( int position,View view ) {
-        mFolderRecyclerView.setVisibility(View.GONE);
         PhotoInfo info = mAdapterGalleryImages.getFolderInfo().getPhotoList().get(position);
 
         if (mIsSingleImagePick){
@@ -153,6 +156,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
                     mSelectPhoto.add(info);
                 }
             }
+            mSelectPreview.setText(getResources().getText(R.string.select_preview)+"("+mSelectPhoto.size()+")");
         }
 
         mAdapterGalleryImages.notifyItemChanged(position);
@@ -161,13 +165,11 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     /**
      * 点击文件夹，改变状态
      */
-    private void folderStatus(){
-        if (mFolderRecyclerView.getVisibility() == View.VISIBLE){
-            mFolderRecyclerView.setVisibility(View.GONE);
-            mFolderRecyclerView.setFocusable(false);
+    private void changeFolderStatus(){
+        if (mLinearLayoutFolder.getVisibility() == View.VISIBLE){
+            mLinearLayoutFolder.setVisibility(View.GONE);
         }else {
-            mFolderRecyclerView.setVisibility(View.VISIBLE);
-            mFolderRecyclerView.setFocusable(true);
+            mLinearLayoutFolder.setVisibility(View.VISIBLE);
         }
     }
 
@@ -182,16 +184,21 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mAdapterGalleryFolder.setFolderSelectListener(this);
 
         mFolderRecyclerView.setAdapter(mAdapterGalleryFolder);
-        mFolderRecyclerView.setVisibility(View.GONE);
         mFolderName = (TextView)findViewById(R.id.folder_name);
         mFolderName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                folderStatus();
+                changeFolderStatus();
             }
         });
 
-
+        mLinearLayoutFolder = (LinearLayout)findViewById(R.id.ly_folder_layer);
+        mLinearLayoutFolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeFolderStatus();
+            }
+        });
         //显示当前文件夹下的所有图像
         mImageRecyclerView = (RecyclerView)findViewById(R.id.recyclerview_image);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, mImageColumn);
@@ -201,18 +208,33 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mAdapterGalleryImages = new AdapterGalleryImages(mContext, mSelectPhoto, this);
         mImageRecyclerView.setAdapter(mAdapterGalleryImages);
 
-        TextView selectFinish = (TextView)findViewById(R.id.bt_finish);
-        selectFinish.setOnClickListener(new View.OnClickListener() {
+        mSelectFinish = (TextView)findViewById(R.id.bt_finish);
+        mSelectFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mSelectPhoto.size() > 0){
-                    mMutilImageCallBack.onHanlderSuccess(UGallery.SELECT_MUTIL_PHOTO, mSelectPhoto);
+                    ActivityPreviewImage.startActivity(mContext, mSelectPhoto);
+                }
+            }
+        });
+        mSelectPreview = (TextView)findViewById(R.id.bt_preview);
+        mSelectPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSelectPhoto.size() > 0){
+                    ActivityPreviewImage.startActivity(mContext, mSelectPhoto);
                 }
             }
         });
         if (!mIsSingleImagePick){
-            selectFinish.setVisibility(View.VISIBLE);
+            mSelectFinish.setVisibility(View.VISIBLE);
+            mSelectPreview.setVisibility(View.VISIBLE);
+        }else {
+            mSelectFinish.setVisibility(View.GONE);
+            mSelectPreview.setVisibility(View.GONE);
         }
+
+        mHandler = new ScanImageHandler(this);
         getPhotos();
     }
 
@@ -227,7 +249,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
 
                 mAllFolder.clear();
                 mAllFolder = PhotoTools.getAllPhotoFolder(mContext, null);
-                mSelectPhoto.clear();
+                //mSelectPhoto.clear();
 
                 refreshAdapter();
             }
@@ -235,35 +257,43 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     }
 
     private void refreshAdapter(){
-        mHanlder.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
+        mHandler.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
     }
-
-
-
-
 
     private void initFresco(){
         ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
-                .setBitmapsConfig( Bitmap.Config.RGB_565)
+             //   .setBitmapsConfig( Bitmap.Config.RGB_565)
+                .setDownsampleEnabled(true)
                 .build();
         Fresco.initialize(this, imagePipelineConfig);
     }
 
-    private Handler mHanlder = new Handler() {
+    /**
+     * 使用静态内部类，防止内存溢出
+     */
+    private static class ScanImageHandler extends Handler{
+        private  WeakReference<ActivitySelectImage> mActivity;
+
+        public ScanImageHandler(ActivitySelectImage activity){
+            mActivity = new WeakReference<ActivitySelectImage>(activity);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            final ActivitySelectImage actiivty = mActivity.get();
+            if (actiivty == null){
+                return;
+            }
             if ( msg.what == HANDLER_REFRESH_LIST_EVENT ){
-                if (mAllFolder.size() > 0){
-                    mFolderName.setText(mAllFolder.get(0).getFolderName());
-                    mAdapterGalleryImages.setFolderInfo(mAllFolder.get(0));
-                }else {
-                    //处理没有图片时的状态
+                if (actiivty.mAllFolder.size() > 0){
+                    actiivty.mFolderName.setText(actiivty.mAllFolder.get(0).getFolderName());
+                    actiivty.mAdapterGalleryImages.setFolderInfo(actiivty.mAllFolder.get(0));
                 }
-                mAdapterGalleryFolder.setmAllFolder(mAllFolder);
-                mAdapterGalleryImages.notifyDataSetChanged();
-                mAdapterGalleryFolder.notifyDataSetChanged();
+                actiivty.mAdapterGalleryFolder.setmAllFolder(actiivty.mAllFolder);
+                actiivty.mAdapterGalleryImages.notifyDataSetChanged();
+                actiivty.mAdapterGalleryFolder.notifyDataSetChanged();
             }
         }
-    };
+    }
 }

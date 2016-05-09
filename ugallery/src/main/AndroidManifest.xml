@@ -11,7 +11,9 @@
                   android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".activity.ActivityTakePhotos"/>
         <activity android:name=".activity.ActivityCropImage"/>
+        <activity android:name=".activity.ActivityPreviewImage"/>
 
     </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

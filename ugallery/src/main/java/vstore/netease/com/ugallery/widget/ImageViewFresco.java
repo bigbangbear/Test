@@ -53,12 +53,6 @@ public class ImageViewFresco extends SimpleDraweeView{
         mContext = context;
     }
 
-    public void loadImageFilePath(String path){
-        Uri uri = Uri.parse("file://"+path);
-        setImageURI(uri);
-    }
-
-
     public void loadImageFilePath(String path, int width, int height){
         Uri uri = Uri.parse("file://"+path);
         //setImageURI(uri);
@@ -83,6 +77,7 @@ public class ImageViewFresco extends SimpleDraweeView{
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setOldController(mDraweeHolder.getController())
                 .setImageRequest(imageRequest)
+                .setAutoPlayAnimations(true)
                 .build();
 
         mDraweeHolder.setController(controller);

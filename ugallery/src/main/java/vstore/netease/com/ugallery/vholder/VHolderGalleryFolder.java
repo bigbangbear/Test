@@ -41,7 +41,7 @@ public class VHolderGalleryFolder extends RecyclerView.ViewHolder{
      */
     public void setGallertFolder(PhotoFolderInfo folderInfo, final FolderSelectListener listener){
         mFolderName.setText(folderInfo.getFolderName());
-        mImageNumbers.setText(folderInfo.getPhotoList().size() + "Photos");
+        mImageNumbers.setText("("+folderInfo.getPhotoList().size() + ")");
         if (folderInfo.getPhotoList().size() != 0) {
             mImageView.loadImageFilePath(folderInfo.getCoverPhoto().getPhotoPath(), 50, 50);
         }else {
