@@ -16,12 +16,16 @@ import vstore.netease.com.ugallery.listener.OnGalleryImagesResultCallback;
  */
 public class UGallery {
     public static int TAKE_PHOTO = 1001;
-    public static int SELECT_SINGLE_PHOTO = 1101;
-    public static int SELECT_MUTIL_PHOTO = 1102;
+    public static int SELECT_PHOTO = 1101;
+    //public static int SELECT_MUTIL_PHOTO = 1102;
     public static int CROP_IMAGE = 1200;
 
     public static void selectSingleImage(Context context, OnGalleryImageResultCallback callback) {
-        ActivitySelectImage.startActivityForSingleImage(context, callback);
+        ActivitySelectImage.startActivityForSingleImage(context, callback, false);
+    }
+
+    public static void selectSingleImageCrop(Context context, OnGalleryImageResultCallback callback) {
+        ActivitySelectImage.startActivityForSingleImage(context, callback, true);
     }
 
     public static void selectMutipleImage(Context context, OnGalleryImagesResultCallback callback) {

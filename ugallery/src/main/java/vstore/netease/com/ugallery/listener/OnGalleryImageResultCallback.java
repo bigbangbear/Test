@@ -1,5 +1,7 @@
 package vstore.netease.com.ugallery.listener;
 
+import android.net.Uri;
+
 /**
  * 选择图像回调，单张图像
  * @author yuhuibin
@@ -11,7 +13,7 @@ public interface OnGalleryImageResultCallback {
      * @param reqeustCode
      * @param path
      */
-    public void onHanlderSuccess(int reqeustCode, String path);
+    public void onHanlderSuccess(int reqeustCode, Uri path);
 
     /**
      * 处理失败或异常

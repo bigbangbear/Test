@@ -34,7 +34,7 @@
         android:layout_margin="10dp"
         android:text="cropImage"
         />
-    
+
     <vstore.netease.com.ugallery.view.GestureImageView
         android:id="@+id/image"
         android:layout_width="match_parent"

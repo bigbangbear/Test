@@ -45,7 +45,7 @@ public class ActivityCropImage extends Activity{
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             //剪裁单张图像后，通过回调返回结果
             final Uri resultUri = UCrop.getOutput(data);
-            mSingleImageCallBack.onHanlderSuccess(UGallery.CROP_IMAGE, resultUri.getPath());
+            mSingleImageCallBack.onHanlderSuccess(UGallery.CROP_IMAGE, resultUri);
             finish();
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);

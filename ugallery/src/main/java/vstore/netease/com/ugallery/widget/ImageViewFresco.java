@@ -53,8 +53,8 @@ public class ImageViewFresco extends SimpleDraweeView{
         mContext = context;
     }
 
-    public void loadImageFilePath(String path, int width, int height){
-        Uri uri = Uri.parse("file://"+path);
+    public void loadImageFilePath(Uri uri, int width, int height){
+        //Uri uri = Uri.parse("file://"+path);
         //setImageURI(uri);
 
         Resources resources = mContext.getResources();

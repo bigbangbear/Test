@@ -16,6 +16,7 @@
 
 package vstore.netease.com.ugallery.model;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import java.io.Serializable;
@@ -28,7 +29,7 @@ import java.io.Serializable;
 public class PhotoInfo implements Serializable {
 
     private int photoId;
-    private String photoPath;
+    private Uri photoPath;
     //private String thumbPath;
     private int width;
     private int height;
@@ -51,11 +52,11 @@ public class PhotoInfo implements Serializable {
         this.height = height;
     }
 
-    public String getPhotoPath() {
+    public Uri getPhotoPath() {
         return photoPath;
     }
 
-    public void setPhotoPath(String photoPath) {
+    public void setPhotoPath(Uri photoPath) {
         this.photoPath = photoPath;
     }
 
@@ -86,6 +87,6 @@ public class PhotoInfo implements Serializable {
             return false;
         }
 
-        return TextUtils.equals(info.getPhotoPath(), getPhotoPath());
+        return TextUtils.equals(info.getPhotoPath().toString(), getPhotoPath().toString());
     }
 }

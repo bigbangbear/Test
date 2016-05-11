@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         openSingleImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UGallery.selectSingleImage(MainActivity.this, new SelectImageResult());
+                UGallery.selectSingleImageCrop(MainActivity.this, new SelectImageResult());
             }
         });
 
@@ -69,9 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
     private class SelectImageResult implements OnGalleryImageResultCallback {
         @Override
-        public void onHanlderSuccess(int reqeustCode, String path) {
-            if (reqeustCode == UGallery.SELECT_SINGLE_PHOTO){
-                mImageUri = Uri.parse("file://"+path);
+        public void onHanlderSuccess(int reqeustCode, Uri path) {
+
+            if (reqeustCode == UGallery.SELECT_PHOTO){
+                //mImageUri = Uri.parse("file://"+path);
                 mImage.setmImagePath(path);
 
             }
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 mImage.setmImagePath(path);
             }
 
-            if (reqeustCode == UGallery.SELECT_MUTIL_PHOTO){
+            if (reqeustCode == UGallery.SELECT_PHOTO){
                 mImageUri = Uri.parse("file://"+path);
             }
         }

@@ -50,12 +50,12 @@ public class VHolderGalleryImage extends RecyclerView.ViewHolder{
      * @param isSelect 更新选中状态
      * @param listener 选中事件处理
      */
-    public void setImage(PhotoInfo info, boolean isSelect, final ImageSelectListener listener){
+    public void setImage(final PhotoInfo info, boolean isSelect, final ImageSelectListener listener){
         mImageView.loadImageFilePath(info.getPhotoPath(), mHeight, mHeight);
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onImageSelectListner(getPosition(), itemView);
+                    listener.onImageSelectListner(getPosition(), itemView);
             }
         });
         if(isSelect){

@@ -39,13 +39,23 @@ public class ActivityTakePhotos extends Activity{
         takePhotoAction();
     }
 
+    /**
+     * 拍照让MediaStore添加数据
+     */
+    private void noticTakePiture(){
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(mTakePhotoUri);
+        sendBroadcast(intent);
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == UGallery.TAKE_PHOTO) {
             if (resultCode == RESULT_OK && mTakePhotoUri != null) {
                 final String path = mTakePhotoUri.getPath();
                 if (new File(path).exists()) {
-                    mCallBack.onHanlderSuccess(UGallery.TAKE_PHOTO, path);
+                    noticTakePiture();
+                    mCallBack.onHanlderSuccess(UGallery.TAKE_PHOTO, mTakePhotoUri);
                     finish();
                 }
                 else {

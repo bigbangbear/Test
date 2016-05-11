@@ -3,12 +3,14 @@ package vstore.netease.com.ugallery.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,12 +45,12 @@ import vstore.netease.com.ugallery.utils.PhotoTools;
 public class ActivitySelectImage extends Activity implements  FolderSelectListener, ImageSelectListener {
     //是否单选图片
     public static boolean mIsSingleImagePick ;
-    //是否截图
-    //public static boolean mIsCrop = true;
     //设置显示图片的列数
     public static int mImageColumn = 3;
     //设置最多选择几张图片
     public static int mMaxSelectImage = 9;
+    //是否截图
+    private static boolean mIsCrop = true;
 
     //返回结果
     private static OnGalleryImageResultCallback mSingleImageCallBack;
@@ -76,9 +78,10 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
      * @param context
      * @param callBack
      */
-    public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack){
+    public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack, boolean iscrop){
         mSingleImageCallBack = callBack;
         mIsSingleImagePick = true;
+        mIsCrop = iscrop;
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
     }
@@ -143,9 +146,21 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     public void onImageSelectListner( int position,View view ) {
         PhotoInfo info = mAdapterGalleryImages.getFolderInfo().getPhotoList().get(position);
 
+        //拍照
+        if (info.getPhotoPath().getScheme().equals("res")){
+            ActivityTakePhotos.startActivityForSingleImage(mContext, mCallback);
+            return;
+        }
+
+        //单选、多选
         if (mIsSingleImagePick){
-                    mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO, info.getPhotoPath());
-                    finish();
+            //是否裁剪
+            if (mIsCrop){
+                ActivityCropImage.startActivity(mContext, mCallback, info.getPhotoPath());
+            }else {
+                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_PHOTO, info.getPhotoPath());
+                finish();
+            }
         }else {
             if (mSelectPhoto.contains(info)){
                 mSelectPhoto.remove(info);
@@ -157,9 +172,8 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
                 }
             }
             mSelectPreview.setText(getResources().getText(R.string.select_preview)+"("+mSelectPhoto.size()+")");
+            mAdapterGalleryImages.notifyItemChanged(position);
         }
-
-        mAdapterGalleryImages.notifyItemChanged(position);
     }
 
     /**
@@ -267,6 +281,31 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
                 .build();
         Fresco.initialize(this, imagePipelineConfig);
     }
+
+    /**
+     * 用于发起拍照、裁剪图像
+     */
+    private OnGalleryImageResultCallback mCallback = new OnGalleryImageResultCallback() {
+        @Override
+        public void onHanlderSuccess(int reqeustCode, Uri path) {
+
+            if (reqeustCode == UGallery.TAKE_PHOTO){
+                getPhotos();
+                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_PHOTO, path);
+            }
+
+            if (reqeustCode == UGallery.CROP_IMAGE){
+                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_PHOTO, path);
+                Log.i("yhb", path.toString());
+            }
+             //finish();
+        }
+
+        @Override
+        public void onHanlderFailure(int requestCode, String errorMsg) {
+
+        }
+    };
 
     /**
      * 使用静态内部类，防止内存溢出

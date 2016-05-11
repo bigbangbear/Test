@@ -47,9 +47,13 @@ public class GestureImageView extends GestureCropImageView{
     public boolean onTouchEvent(MotionEvent event) {
         if (getImageUri() == null && mImageUri == null){
             return false;
-        }else {
-            return super.onTouchEvent(event);
         }
+
+        //多点触控的时候，中断父控件获取到事件
+        if (event.getPointerCount() > 1){
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
+        return super.onTouchEvent(event);
     }
 
     protected int calculateMaxBitmapSize() {
@@ -100,8 +104,7 @@ public class GestureImageView extends GestureCropImageView{
      * 设置本地图像的路径
      * @param path
      */
-    public void setmImagePath(@NonNull String path){
-        Uri uri = Uri.parse("file://"+path);
-        setImageUri(uri);
+    public void setmImagePath(@NonNull Uri path){
+        setImageUri(path);
     }
 }
