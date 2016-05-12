@@ -36,7 +36,7 @@ import vstore.netease.com.ugallery.utils.PhotoTools;
  * @author yuhuibin
  * @date 2016-04-22
  */
-public class ActivitySelectImage extends Activity implements  FolderSelectListener, ImageSelectListener {
+public class ActivitySelectImage extends ActivityUGalleryBase implements  FolderSelectListener, ImageSelectListener {
     //是否单选图片
     public static boolean mIsSingleImagePick ;
     //设置显示图片的列数
@@ -148,13 +148,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         }
     }
 
-    private void returnSingleImage(Uri uri){
-        Intent intent = new Intent();
-        intent.putExtra(UGallery.PATH, uri.getPath());
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
     @Override
     public void onFolderSelectListner(int position) {
         mFolderName.setText(mAllFolder.get(position).getFolderName());
@@ -195,6 +188,13 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
             mSelectPreview.setText(getResources().getText(R.string.select_preview)+"("+mSelectPhoto.size()+")");
             mAdapterGalleryImages.notifyItemChanged(position);
         }
+    }
+
+    private void returnSingleImage(Uri uri){
+        Intent intent = new Intent();
+        intent.putExtra(UGallery.PATH, uri.getPath());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     private void cropImage(Uri uri){
@@ -298,7 +298,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     private void refreshAdapter(){
         mHandler.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
     }
-
 
     /**
      * 使用静态内部类，防止内存溢出

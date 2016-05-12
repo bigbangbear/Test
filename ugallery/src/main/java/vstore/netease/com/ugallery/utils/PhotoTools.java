@@ -63,11 +63,11 @@ public class PhotoTools {
         allPhotoFolderInfo.setFolderName(context.getResources().getString(R.string.all_photo));
         allPhotoFolderInfo.setPhotoList(new ArrayList<PhotoInfo>());
         allPhotoFolderList.add(0, allPhotoFolderInfo);
-        //
-        PhotoInfo takePicture = new PhotoInfo();
-        Uri takePictureUri = Uri.parse("res:///"+R.drawable.photo);
-        takePicture.setPhotoPath(takePictureUri);
-        allPhotoFolderInfo.getPhotoList().add(takePicture);
+        //拍照
+//        PhotoInfo takePicture = new PhotoInfo();
+//        Uri takePictureUri = Uri.parse("res:///"+R.drawable.photo);
+//        takePicture.setPhotoPath(takePictureUri);
+//        allPhotoFolderInfo.getPhotoList().add(takePicture);
 
         List<String> selectedList = new ArrayList<>();
         List<String> filterList = new ArrayList<>();

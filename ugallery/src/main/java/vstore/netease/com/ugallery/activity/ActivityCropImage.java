@@ -74,7 +74,9 @@ public class ActivityCropImage extends Activity{
         options.setHideBottomControls(true);
         options.setFreeStyleCropEnabled(false);
         options.setAllowedGestures(UCropActivity.SCALE,UCropActivity.SCALE, UCropActivity.SCALE);
-        options.setToolbarColor(getResources().getColor(R.color.colorPrimary));
+        options.setToolbarColor(getResources().getColor(R.color.cropToolBar));
+        options.setCropFrameColor(getResources().getColor(R.color.white));
+      //  options.setDimmedLayerColor(getResources().getColor(R.color.white));
         return options;
     }
 }
