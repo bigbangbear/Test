@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_bar_height"
+                android:background="@color/toolbar_background">
+
+    <ImageView
+        android:id="@+id/toolbar_back"
+        android:layout_width="@dimen/action_bar_back_width"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/common_icon_arrow_left_normal" />
+
+    <TextView
+        android:id="@+id/toolbar_right_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:gravity="center"
+        android:layout_marginRight="@dimen/action_bar_right_padding"
+        android:layout_centerVertical="true"/>
+
+    <TextView
+        android:id="@+id/toolbar_left_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/action_bar_right_padding"
+        android:layout_toLeftOf="@+id/toolbar_right_button" />
+
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/action_bar_back_title_padding"
+        android:layout_toLeftOf="@id/toolbar_left_button"
+        android:layout_toRightOf="@+id/toolbar_back"
+        android:clickable="true"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@drawable/color_action_bar_text_btn_selector"
+        android:textSize="@dimen/action_bar_title_text_size"
+        tools:text="秀品" />
+
+</RelativeLayout>
