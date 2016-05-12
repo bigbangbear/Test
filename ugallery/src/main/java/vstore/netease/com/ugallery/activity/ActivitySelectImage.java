@@ -90,6 +90,7 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_image);
+        setTitle("照片");
         mContext = this;
         initView();
     }

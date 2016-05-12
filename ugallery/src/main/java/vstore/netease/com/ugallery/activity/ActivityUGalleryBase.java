@@ -7,7 +7,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import vstore.netease.com.ugallery.R;
 
@@ -51,14 +53,29 @@ public class ActivityUGalleryBase extends AppCompatActivity{
 
         initNormalTitlebar();
     }
+    private View mTitleBar;
+    private ImageView mTitleBarBack;
+    private TextView mTitleBarTitle;
     private void initNormalTitlebar() {
 
-//        mTitleBar = getLayoutInflater().inflate(R.layout.view_toolbar_title, null);//通用的一种标题栏布局，包含一个返回键、标题、最右两个按钮。
-//        mTitleBarBack = (ImageView) mTitleBar.findViewById(R.id.toolbar_back);
-//        mTitleBarTitle = (TextView) mTitleBar.findViewById(R.id.toolbar_title);
-//        mTitleBarLeftButton = (TextView) mTitleBar.findViewById(R.id.toolbar_left_button);
-//        mTitleBarRightButton = (TextView) mTitleBar.findViewById(R.id.toolbar_right_button);//目前最右的这个设为购物车
-//
-//        mTitleBarBack.setOnClickListener(mClickBack);
+        mTitleBar = getLayoutInflater().inflate(R.layout.view_toolbar_title, null);//通用的一种标题栏布局，包含一个返回键、标题、最右两个按钮。
+        mTitleBarBack = (ImageView) mTitleBar.findViewById(R.id.toolbar_back);
+        mTitleBarTitle = (TextView) mTitleBar.findViewById(R.id.toolbar_title);
+
+        mTitleBarBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        Toolbar.LayoutParams lp = new Toolbar.LayoutParams(
+                Toolbar.LayoutParams.MATCH_PARENT,
+                Toolbar.LayoutParams.MATCH_PARENT);//传入的布局，覆盖整个Toolbar
+        mToolbar.addView(mTitleBar, lp);
+    }
+
+    public void setTitle(String string){
+        mTitleBarTitle.setText(string);
     }
 }
