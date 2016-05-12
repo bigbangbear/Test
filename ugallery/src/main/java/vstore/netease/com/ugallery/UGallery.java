@@ -19,6 +19,8 @@ public class UGallery {
     //public static int SELECT_MUTIL_PHOTO = 1102;
     public static final int CROP_IMAGE = 1200;
 
+    public static String PATH = "PATH";
+
     public static void selectSingleImage(Context context ) {
         ActivitySelectImage.startActivityForSingleImage(context, false);
     }
@@ -43,7 +45,11 @@ public class UGallery {
         ActivityTakePhotos.startActivityForTakePhoto(context, true );
     }
 
-    public static String PATH = "PATH";
+    /**
+     * onActivityResult中返回结果，从intent(data)中解析数据
+     * @param intent
+     * @return
+     */
     public static Uri getData(Intent intent){
         String path = intent.getStringExtra(PATH);
         Uri uri = Uri.parse("file://"+path);
