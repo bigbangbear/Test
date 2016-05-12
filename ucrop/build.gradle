@@ -10,7 +10,7 @@ android {
         versionCode 16
         versionName "1.5.0"
 
-        vectorDrawables.useSupportLibrary = true
+      //  vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {

@@ -13,25 +13,21 @@ import java.io.File;
 
 import vstore.netease.com.ugallery.R;
 import vstore.netease.com.ugallery.UGallery;
-import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
 
 /**
  * @author yuhuibin
  * @date 2016-05-06
  */
 public class ActivityCropImage extends Activity{
-    private static OnGalleryImageResultCallback mSingleImageCallBack;
     private static Uri mUri;
     /**
      * 剪裁图像
      * @param context
-     * @param callBack
      */
-    public static void startActivity(Context context, OnGalleryImageResultCallback callBack, Uri uri){
-        mSingleImageCallBack = callBack;
+    public static void startActivity(Context context,  Uri uri){
         mUri = uri;
         Intent intent = new Intent(context, ActivityCropImage.class);
-        ( (Activity)context).startActivity(intent);
+        ( (Activity)context).startActivityForResult(intent, UGallery.CROP_IMAGE);
     }
 
     @Override
@@ -45,17 +41,17 @@ public class ActivityCropImage extends Activity{
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             //剪裁单张图像后，通过回调返回结果
             final Uri resultUri = UCrop.getOutput(data);
-            mSingleImageCallBack.onHanlderSuccess(UGallery.CROP_IMAGE, resultUri);
-            finish();
+            setResult(RESULT_OK, new Intent()
+                .putExtra(UGallery.PATH, resultUri.getPath())
+            );
         } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
         }
+        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        finish();
     }
 
     /**

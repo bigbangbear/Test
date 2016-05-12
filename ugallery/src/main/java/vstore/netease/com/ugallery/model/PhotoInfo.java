@@ -29,7 +29,7 @@ import java.io.Serializable;
 public class PhotoInfo implements Serializable {
 
     private int photoId;
-    private Uri photoPath;
+    private String photoPath;
     //private String thumbPath;
     private int width;
     private int height;
@@ -53,11 +53,11 @@ public class PhotoInfo implements Serializable {
     }
 
     public Uri getPhotoPath() {
-        return photoPath;
+        return Uri.parse(photoPath);
     }
 
     public void setPhotoPath(Uri photoPath) {
-        this.photoPath = photoPath;
+        this.photoPath = photoPath.toString();
     }
 
     public int getPhotoId() {

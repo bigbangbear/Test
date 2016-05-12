@@ -10,14 +10,10 @@ import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -29,8 +25,6 @@ import vstore.netease.com.ugallery.adpter.AdapterGalleryFolder;
 import vstore.netease.com.ugallery.adpter.AdapterGalleryImages;
 import vstore.netease.com.ugallery.listener.FolderSelectListener;
 import vstore.netease.com.ugallery.listener.ImageSelectListener;
-import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
-import vstore.netease.com.ugallery.listener.OnGalleryImagesResultCallback;
 import vstore.netease.com.ugallery.model.PhotoFolderInfo;
 import vstore.netease.com.ugallery.model.PhotoInfo;
 import vstore.netease.com.ugallery.utils.PhotoTools;
@@ -53,8 +47,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     private static boolean mIsCrop = true;
 
     //返回结果
-    private static OnGalleryImageResultCallback mSingleImageCallBack;
-    private static OnGalleryImagesResultCallback mMutilImageCallBack;
     private static final int HANDLER_REFRESH_LIST_EVENT = 1002;
 
     List<PhotoFolderInfo> mAllFolder = new ArrayList<>();
@@ -76,23 +68,19 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     /**
      * 选择单张照片
      * @param context
-     * @param callBack
      */
-    public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack, boolean iscrop){
-        mSingleImageCallBack = callBack;
+    public static void startActivityForSingleImage(Context context, boolean iscrop){
         mIsSingleImagePick = true;
         mIsCrop = iscrop;
         Intent intent = new Intent(context, ActivitySelectImage.class);
-        ( (Activity)context).startActivity(intent);
+        ( (Activity)context).startActivityForResult(intent, UGallery.SELECT_PHOTO);
     }
 
     /**
      * 选择多张照片
      * @param context
-     * @param callBack
      */
-    public static void startActivityForMutilImage(Context context, OnGalleryImagesResultCallback callBack){
-        mMutilImageCallBack = callBack;
+    public static void startActivityForMutilImage(Context context){
         mIsSingleImagePick = false;
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
@@ -103,7 +91,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_image);
         mContext = this;
-        initFresco();
         initView();
     }
 
@@ -134,6 +121,41 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode != RESULT_OK){
+            return;
+        }
+
+        if (requestCode == UGallery.CROP_IMAGE){
+            Uri uri = UGallery.getData(data);
+            returnSingleImage(uri);
+        }
+
+        if (requestCode == UGallery.TAKE_PHOTO){
+            getPhotos();
+            if (mIsSingleImagePick) {
+                Uri uri = UGallery.getData(data);
+                if (mIsCrop) {
+                    cropImage(uri);
+                    return;
+                }
+                else {
+                    returnSingleImage(uri);
+                }
+            }
+        }
+    }
+
+    private void returnSingleImage(Uri uri){
+        Intent intent = new Intent();
+        intent.putExtra(UGallery.PATH, uri.getPath());
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
     public void onFolderSelectListner(int position) {
         mFolderName.setText(mAllFolder.get(position).getFolderName());
         changeFolderStatus();
@@ -148,7 +170,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
 
         //拍照
         if (info.getPhotoPath().getScheme().equals("res")){
-            ActivityTakePhotos.startActivityForSingleImage(mContext, mCallback);
+            UGallery.takePhoto(mContext);
             return;
         }
 
@@ -156,10 +178,9 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         if (mIsSingleImagePick){
             //是否裁剪
             if (mIsCrop){
-                ActivityCropImage.startActivity(mContext, mCallback, info.getPhotoPath());
+                cropImage(info.getPhotoPath());
             }else {
-                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_PHOTO, info.getPhotoPath());
-                finish();
+                returnSingleImage(info.getPhotoPath());
             }
         }else {
             if (mSelectPhoto.contains(info)){
@@ -174,6 +195,10 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
             mSelectPreview.setText(getResources().getText(R.string.select_preview)+"("+mSelectPhoto.size()+")");
             mAdapterGalleryImages.notifyItemChanged(position);
         }
+    }
+
+    private void cropImage(Uri uri){
+        UGallery.cropImage(mContext, uri);
     }
 
     /**
@@ -274,38 +299,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mHandler.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
     }
 
-    private void initFresco(){
-        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
-             //   .setBitmapsConfig( Bitmap.Config.RGB_565)
-                .setDownsampleEnabled(true)
-                .build();
-        Fresco.initialize(this, imagePipelineConfig);
-    }
-
-    /**
-     * 用于发起拍照、裁剪图像
-     */
-    private OnGalleryImageResultCallback mCallback = new OnGalleryImageResultCallback() {
-        @Override
-        public void onHanlderSuccess(int reqeustCode, Uri path) {
-
-            if (reqeustCode == UGallery.TAKE_PHOTO){
-                getPhotos();
-                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_PHOTO, path);
-            }
-
-            if (reqeustCode == UGallery.CROP_IMAGE){
-                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_PHOTO, path);
-                Log.i("yhb", path.toString());
-            }
-             //finish();
-        }
-
-        @Override
-        public void onHanlderFailure(int requestCode, String errorMsg) {
-
-        }
-    };
 
     /**
      * 使用静态内部类，防止内存溢出
