@@ -27,6 +27,7 @@ import vstore.netease.com.ugallery.listener.FolderSelectListener;
 import vstore.netease.com.ugallery.listener.ImageSelectListener;
 import vstore.netease.com.ugallery.model.PhotoFolderInfo;
 import vstore.netease.com.ugallery.model.PhotoInfo;
+import vstore.netease.com.ugallery.utils.AnimationUtil;
 import vstore.netease.com.ugallery.utils.PhotoTools;
 
 
@@ -204,12 +205,18 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
 
     /**
      * 点击文件夹，改变状态
+     * 注意动画与setVisibility的时序
      */
     private void changeFolderStatus(){
         if (mLinearLayoutFolder.getVisibility() == View.VISIBLE){
+            new AnimationUtil(getApplicationContext(), R.anim.translate_down)
+                    .setLinearInterpolator().startAnimation(mLinearLayoutFolder);
             mLinearLayoutFolder.setVisibility(View.GONE);
+
         }else {
             mLinearLayoutFolder.setVisibility(View.VISIBLE);
+            new AnimationUtil(getApplicationContext(), R.anim.translate_up_current)
+                    .setLinearInterpolator().startAnimation(mLinearLayoutFolder);
         }
     }
 
