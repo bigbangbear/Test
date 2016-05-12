@@ -18,6 +18,7 @@ package vstore.netease.com.ugallery.utils;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
 
 import java.io.File;
@@ -62,6 +63,12 @@ public class PhotoTools {
         allPhotoFolderInfo.setFolderName(context.getResources().getString(R.string.all_photo));
         allPhotoFolderInfo.setPhotoList(new ArrayList<PhotoInfo>());
         allPhotoFolderList.add(0, allPhotoFolderInfo);
+        //
+        PhotoInfo takePicture = new PhotoInfo();
+        Uri takePictureUri = Uri.parse("res:///"+R.drawable.photo);
+        takePicture.setPhotoPath(takePictureUri);
+        allPhotoFolderInfo.getPhotoList().add(takePicture);
+
         List<String> selectedList = new ArrayList<>();
         List<String> filterList = new ArrayList<>();
 
@@ -85,7 +92,8 @@ public class PhotoTools {
                     if ( (filterList == null || !filterList.contains(path)) && file.exists() && file.length() > 0 ) {
                         final PhotoInfo photoInfo = new PhotoInfo();
                         photoInfo.setPhotoId(imageId);
-                        photoInfo.setPhotoPath(path);
+                        Uri uri = Uri.parse("file://"+path);
+                        photoInfo.setPhotoPath(uri);
                         //photoInfo.setThumbPath(thumb);
                         if (allPhotoFolderInfo.getCoverPhoto() == null) {
                             allPhotoFolderInfo.setCoverPhoto(photoInfo);

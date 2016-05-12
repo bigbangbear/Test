@@ -2,34 +2,57 @@ package vstore.netease.com.ugallery;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 
+import vstore.netease.com.ugallery.activity.ActivityCropImage;
 import vstore.netease.com.ugallery.activity.ActivitySelectImage;
 import vstore.netease.com.ugallery.activity.ActivityTakePhotos;
-import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
-import vstore.netease.com.ugallery.listener.OnGalleryImagesResultCallback;
 
 /**
  * @author yuhuibin
  * @date 2016-04-28
  */
 public class UGallery {
+    public static final int TAKE_PHOTO = 1001;
+    public static final int SELECT_PHOTO = 1101;
+    //public static int SELECT_MUTIL_PHOTO = 1102;
+    public static final int CROP_IMAGE = 1200;
 
-    public static int TAKE_PHOTO_SUCCESS = 1001;
-    public static int TAKE_PHOTO_FAIL = 1002;
-    public static int SELECT_SINGLE_PHOTO_SUCCESS = 1101;
-    public static int SELECT_SINGLE_PHOTO_FAIL = 1102;
+    public static String PATH = "PATH";
 
-    public static void selectSingleImage(Context context, OnGalleryImageResultCallback callback) {
-        ActivitySelectImage.startActivityForSingleImage(context, callback);
+    public static void selectSingleImage(Context context ) {
+        ActivitySelectImage.startActivityForSingleImage(context, false);
     }
 
-    public static void selectMutipleImage(Context context, OnGalleryImagesResultCallback callback) {
-        ActivitySelectImage.startActivityForMutilImage(context, callback);
+    public static void selectSingleImageCrop(Context context ) {
+        ActivitySelectImage.startActivityForSingleImage(context, true);
     }
 
-    public static void takePhoto(Context context, OnGalleryImageResultCallback callback) {
-        ActivityTakePhotos.startActivityForSingleImage(context, callback );
+    public static void selectMutipleImage(Context context ) {
+        ActivitySelectImage.startActivityForMutilImage(context);
     }
 
-    
+    public static void cropImage(Context context, Uri uri) {
+        ActivityCropImage.startActivity(context, uri);
+    }
+
+    public static void takePhoto(Context context) {
+        ActivityTakePhotos.startActivityForTakePhoto(context, false );
+    }
+
+    public static void takePhotoCrop(Context context) {
+        ActivityTakePhotos.startActivityForTakePhoto(context, true );
+    }
+
+    /**
+     * onActivityResult中返回结果，从intent(data)中解析数据
+     * @param intent
+     * @return
+     */
+    public static Uri getData(Intent intent){
+        String path = intent.getStringExtra(PATH);
+        Uri uri = Uri.parse("file://"+path);
+        return uri;
+    }
 }

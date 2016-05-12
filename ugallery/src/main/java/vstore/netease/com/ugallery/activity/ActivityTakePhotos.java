@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -15,21 +14,21 @@ import java.util.Date;
 import java.util.Locale;
 
 import vstore.netease.com.ugallery.UGallery;
-import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
 
 /**
- * @author yuhuibin
+ * 拍照的Activity
+ * @author liangbin
  * @date 2016-05-05
  */
 public class ActivityTakePhotos extends Activity{
     private static final String TAG = "ActivityTakePhotos";
-    private static OnGalleryImageResultCallback mCallBack;
-
+    //Test
     private Uri mTakePhotoUri = null;
-    public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack){
-        mCallBack = callBack;
+    private static boolean mIsCrop;
+    public static void startActivityForTakePhoto(Context context, boolean isCrop ){
+        mIsCrop = isCrop;
         Intent intent = new Intent(context, ActivityTakePhotos.class);
-        ( (Activity)context).startActivity(intent);
+        ( (Activity)context).startActivityForResult(intent, UGallery.TAKE_PHOTO);
     }
 
     @Override
@@ -38,22 +37,55 @@ public class ActivityTakePhotos extends Activity{
         takePhotoAction();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    /**
+     * 拍照让MediaStore添加数据
+     */
+    private void noticTakePiture(){
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(mTakePhotoUri);
+        sendBroadcast(intent);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == UGallery.TAKE_PHOTO_SUCCESS) {
-            if (resultCode == RESULT_OK && mTakePhotoUri != null) {
-                final String path = mTakePhotoUri.getPath();
-                if (new File(path).exists()) {
-                    mCallBack.onHanlderSuccess(UGallery.TAKE_PHOTO_SUCCESS, path);
-                    finish();
-                }
-                else {
-                    mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO_FAIL, "take photo fail");
+
+        if (resultCode != RESULT_OK){
+            return;
+        }
+        if (requestCode == UGallery.TAKE_PHOTO) {
+
+            if (  mTakePhotoUri != null) {
+                if (mIsCrop){
+                    UGallery.cropImage(ActivityTakePhotos.this, mTakePhotoUri);
+                }else {
+                    returnSingleImage(mTakePhotoUri);
                 }
             }
-            else {
-                mCallBack.onHanlderFailure(UGallery.TAKE_PHOTO_FAIL, "take photo fail");
-            }
+        }
+
+        if (requestCode == UGallery.CROP_IMAGE){
+            Uri uri = UGallery.getData(data);
+            returnSingleImage(uri);
+        }
+
+
+    }
+
+    private void returnSingleImage(Uri uri){
+        final String path = uri.getPath();
+        if (new File(path).exists()) {
+            noticTakePiture();
+            Intent intent = new Intent();
+            intent.putExtra(UGallery.PATH, uri.getPath());
+            setResult(RESULT_OK, intent);
+            finish();
         }
     }
 
@@ -70,9 +102,10 @@ public class ActivityTakePhotos extends Activity{
             File img = new File(mTakePhotoFolder, fileName+ ".jpg");
             mTakePhotoUri = Uri.fromFile(img);
         }
-        Log.v(TAG,"mTakePhotoUri---"+mTakePhotoUri);
         Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mTakePhotoUri);
-        startActivityForResult(captureIntent, UGallery.TAKE_PHOTO_SUCCESS);
+        startActivityForResult(captureIntent, UGallery.TAKE_PHOTO);
     }
+
+
 }

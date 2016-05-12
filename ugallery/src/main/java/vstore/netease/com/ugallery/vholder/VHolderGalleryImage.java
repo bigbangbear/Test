@@ -3,6 +3,7 @@ package vstore.netease.com.ugallery.vholder;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -38,9 +39,9 @@ public class VHolderGalleryImage extends RecyclerView.ViewHolder{
             DisplayMetrics dm = new DisplayMetrics();
             dm = itemView.getContext().getResources().getDisplayMetrics();
             mHeight = dm.widthPixels / mImageNumbers;
+            Log.i("yu", "height");
         }
         mLinearLayout.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mHeight));
-
     }
 
     /**
@@ -49,13 +50,12 @@ public class VHolderGalleryImage extends RecyclerView.ViewHolder{
      * @param isSelect 更新选中状态
      * @param listener 选中事件处理
      */
-    public void setImage(PhotoInfo info, boolean isSelect, final ImageSelectListener listener){
-
+    public void setImage(final PhotoInfo info, boolean isSelect, final ImageSelectListener listener){
         mImageView.loadImageFilePath(info.getPhotoPath(), mHeight, mHeight);
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onImageSelectListner(getPosition(), itemView);
+                    listener.onImageSelectListner(getPosition(), itemView);
             }
         });
         if(isSelect){

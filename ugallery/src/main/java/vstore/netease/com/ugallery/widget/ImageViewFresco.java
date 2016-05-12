@@ -2,7 +2,6 @@ package vstore.netease.com.ugallery.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
 
@@ -17,7 +16,7 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
-import vstore.netease.com.ugallery.R;
+import vstore.netease.com.ugallery.view.ImageProgressHolderDrawable;
 
 /**
  * @author yuhuibin
@@ -53,23 +52,14 @@ public class ImageViewFresco extends SimpleDraweeView{
         mContext = context;
     }
 
-    public void loadImageFilePath(String path){
-        Uri uri = Uri.parse("file://"+path);
-        setImageURI(uri);
-    }
-
-
-    public void loadImageFilePath(String path, int width, int height){
-        Uri uri = Uri.parse("file://"+path);
-        //setImageURI(uri);
-
+    public void loadImageFilePath(Uri uri, int width, int height){
+        ImageProgressHolderDrawable progressDrawable = new ImageProgressHolderDrawable(getContext());
         Resources resources = mContext.getResources();
-        //自定义图片的显示
-        Drawable drawable = mContext.getResources().getDrawable(R.drawable.ic_gf_default_photo);
+        //Drawable drawable = mContext.getResources().getDrawable(R.drawable.ic_gf_default_photo);
         GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(resources)
                 .setFadeDuration(300)
-                .setPlaceholderImage(drawable)
-                .setFailureImage(drawable)
+                .setPlaceholderImage(progressDrawable)
+                .setFailureImage(progressDrawable)
                 .setProgressBarImage(new ProgressBarDrawable())
                 .build();
         setHierarchy(hierarchy);
@@ -83,6 +73,7 @@ public class ImageViewFresco extends SimpleDraweeView{
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setOldController(mDraweeHolder.getController())
                 .setImageRequest(imageRequest)
+                .setAutoPlayAnimations(true)
                 .build();
 
         mDraweeHolder.setController(controller);

@@ -3,7 +3,6 @@ package vstore.netease.com.ugallery.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,14 +11,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.yalantis.ucrop.UCrop;
-
-import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +25,6 @@ import vstore.netease.com.ugallery.adpter.AdapterGalleryFolder;
 import vstore.netease.com.ugallery.adpter.AdapterGalleryImages;
 import vstore.netease.com.ugallery.listener.FolderSelectListener;
 import vstore.netease.com.ugallery.listener.ImageSelectListener;
-import vstore.netease.com.ugallery.listener.OnGalleryImageResultCallback;
-import vstore.netease.com.ugallery.listener.OnGalleryImagesResultCallback;
 import vstore.netease.com.ugallery.model.PhotoFolderInfo;
 import vstore.netease.com.ugallery.model.PhotoInfo;
 import vstore.netease.com.ugallery.utils.PhotoTools;
@@ -45,15 +39,15 @@ import vstore.netease.com.ugallery.utils.PhotoTools;
 public class ActivitySelectImage extends Activity implements  FolderSelectListener, ImageSelectListener {
     //是否单选图片
     public static boolean mIsSingleImagePick ;
-    public static boolean mIsCrop = true;
     //设置显示图片的列数
     public static int mImageColumn = 3;
     //设置最多选择几张图片
-    public static int mMaxSelectImage = 2;
+    public static int mMaxSelectImage = 9;
+    //是否截图
+    private static boolean mIsCrop = true;
 
     //返回结果
-    private static OnGalleryImageResultCallback mSingleImageCallBack;
-    private static OnGalleryImagesResultCallback mMutilImageCallBack;
+    private static final int HANDLER_REFRESH_LIST_EVENT = 1002;
 
     List<PhotoFolderInfo> mAllFolder = new ArrayList<>();
     ArrayList<PhotoInfo> mSelectPhoto = new ArrayList<>();
@@ -64,27 +58,29 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     private AdapterGalleryImages mAdapterGalleryImages;
     private TextView mFolderName;
     private Context mContext;
-    private final int HANDLER_REFRESH_LIST_EVENT = 1002;
+    private LinearLayout mLinearLayoutFolder;
+
+    private TextView mSelectFinish;
+    private TextView mSelectPreview;
+
+    private ScanImageHandler mHandler;
 
     /**
      * 选择单张照片
      * @param context
-     * @param callBack
      */
-    public static void startActivityForSingleImage(Context context, OnGalleryImageResultCallback callBack){
-        mSingleImageCallBack = callBack;
+    public static void startActivityForSingleImage(Context context, boolean iscrop){
         mIsSingleImagePick = true;
+        mIsCrop = iscrop;
         Intent intent = new Intent(context, ActivitySelectImage.class);
-        ( (Activity)context).startActivity(intent);
+        ( (Activity)context).startActivityForResult(intent, UGallery.SELECT_PHOTO);
     }
 
     /**
      * 选择多张照片
      * @param context
-     * @param callBack
      */
-    public static void startActivityForMutilImage(Context context, OnGalleryImagesResultCallback callBack){
-        mMutilImageCallBack = callBack;
+    public static void startActivityForMutilImage(Context context){
         mIsSingleImagePick = false;
         Intent intent = new Intent(context, ActivitySelectImage.class);
         ( (Activity)context).startActivity(intent);
@@ -95,7 +91,6 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_image);
         mContext = this;
-        initFresco();
         initView();
     }
 
@@ -126,21 +121,44 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            //剪裁单张图像后，通过回调返回结果
-            final Uri resultUri = UCrop.getOutput(data);
-            mSingleImageCallBack.onHanlderSuccess(UCrop.RESULT_ERROR, resultUri.getPath());
-            finish();
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode != RESULT_OK){
+            return;
         }
+
+        if (requestCode == UGallery.CROP_IMAGE){
+            Uri uri = UGallery.getData(data);
+            returnSingleImage(uri);
+        }
+
+        if (requestCode == UGallery.TAKE_PHOTO){
+            getPhotos();
+            if (mIsSingleImagePick) {
+                Uri uri = UGallery.getData(data);
+                if (mIsCrop) {
+                    cropImage(uri);
+                    return;
+                }
+                else {
+                    returnSingleImage(uri);
+                }
+            }
+        }
+    }
+
+    private void returnSingleImage(Uri uri){
+        Intent intent = new Intent();
+        intent.putExtra(UGallery.PATH, uri.getPath());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     @Override
     public void onFolderSelectListner(int position) {
         mFolderName.setText(mAllFolder.get(position).getFolderName());
-        mFolderRecyclerView.setVisibility(View.GONE);
+        changeFolderStatus();
         mAdapterGalleryImages.setFolderInfo(mAllFolder.get(position));
         mAdapterGalleryImages.notifyDataSetChanged();
     }
@@ -148,15 +166,21 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     /** 点击图片回调函数，处理单选，复选*/
     @Override
     public void onImageSelectListner( int position,View view ) {
-        mFolderRecyclerView.setVisibility(View.GONE);
         PhotoInfo info = mAdapterGalleryImages.getFolderInfo().getPhotoList().get(position);
 
+        //拍照
+        if (info.getPhotoPath().getScheme().equals("res")){
+            UGallery.takePhoto(mContext);
+            return;
+        }
+
+        //单选、多选
         if (mIsSingleImagePick){
+            //是否裁剪
             if (mIsCrop){
-                startCropImage(info.getPhotoPath());
+                cropImage(info.getPhotoPath());
             }else {
-                mSingleImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, info.getPhotoPath());
-                finish();
+                returnSingleImage(info.getPhotoPath());
             }
         }else {
             if (mSelectPhoto.contains(info)){
@@ -168,21 +192,23 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
                     mSelectPhoto.add(info);
                 }
             }
+            mSelectPreview.setText(getResources().getText(R.string.select_preview)+"("+mSelectPhoto.size()+")");
+            mAdapterGalleryImages.notifyItemChanged(position);
         }
+    }
 
-        mAdapterGalleryImages.notifyItemChanged(position);
+    private void cropImage(Uri uri){
+        UGallery.cropImage(mContext, uri);
     }
 
     /**
      * 点击文件夹，改变状态
      */
-    private void folderStatus(){
-        if (mFolderRecyclerView.getVisibility() == View.VISIBLE){
-            mFolderRecyclerView.setVisibility(View.GONE);
-            mFolderRecyclerView.setFocusable(false);
+    private void changeFolderStatus(){
+        if (mLinearLayoutFolder.getVisibility() == View.VISIBLE){
+            mLinearLayoutFolder.setVisibility(View.GONE);
         }else {
-            mFolderRecyclerView.setVisibility(View.VISIBLE);
-            mFolderRecyclerView.setFocusable(true);
+            mLinearLayoutFolder.setVisibility(View.VISIBLE);
         }
     }
 
@@ -197,16 +223,21 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mAdapterGalleryFolder.setFolderSelectListener(this);
 
         mFolderRecyclerView.setAdapter(mAdapterGalleryFolder);
-        mFolderRecyclerView.setVisibility(View.GONE);
         mFolderName = (TextView)findViewById(R.id.folder_name);
         mFolderName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                folderStatus();
+                changeFolderStatus();
             }
         });
 
-
+        mLinearLayoutFolder = (LinearLayout)findViewById(R.id.ly_folder_layer);
+        mLinearLayoutFolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeFolderStatus();
+            }
+        });
         //显示当前文件夹下的所有图像
         mImageRecyclerView = (RecyclerView)findViewById(R.id.recyclerview_image);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, mImageColumn);
@@ -216,18 +247,33 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
         mAdapterGalleryImages = new AdapterGalleryImages(mContext, mSelectPhoto, this);
         mImageRecyclerView.setAdapter(mAdapterGalleryImages);
 
-        TextView selectFinish = (TextView)findViewById(R.id.bt_finish);
-        selectFinish.setOnClickListener(new View.OnClickListener() {
+        mSelectFinish = (TextView)findViewById(R.id.bt_finish);
+        mSelectFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mSelectPhoto.size() > 0){
-                    mMutilImageCallBack.onHanlderSuccess(UGallery.SELECT_SINGLE_PHOTO_SUCCESS, mSelectPhoto);
+                    ActivityPreviewImage.startActivity(mContext, mSelectPhoto);
+                }
+            }
+        });
+        mSelectPreview = (TextView)findViewById(R.id.bt_preview);
+        mSelectPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSelectPhoto.size() > 0){
+                    ActivityPreviewImage.startActivity(mContext, mSelectPhoto);
                 }
             }
         });
         if (!mIsSingleImagePick){
-            selectFinish.setVisibility(View.VISIBLE);
+            mSelectFinish.setVisibility(View.VISIBLE);
+            mSelectPreview.setVisibility(View.VISIBLE);
+        }else {
+            mSelectFinish.setVisibility(View.GONE);
+            mSelectPreview.setVisibility(View.GONE);
         }
+
+        mHandler = new ScanImageHandler(this);
         getPhotos();
     }
 
@@ -242,7 +288,7 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
 
                 mAllFolder.clear();
                 mAllFolder = PhotoTools.getAllPhotoFolder(mContext, null);
-                mSelectPhoto.clear();
+                //mSelectPhoto.clear();
 
                 refreshAdapter();
             }
@@ -250,56 +296,36 @@ public class ActivitySelectImage extends Activity implements  FolderSelectListen
     }
 
     private void refreshAdapter(){
-        mHanlder.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
+        mHandler.sendEmptyMessageAtTime(HANDLER_REFRESH_LIST_EVENT, 100);
     }
+
 
     /**
-     * 剪裁图片参数配置
-     * @return
+     * 使用静态内部类，防止内存溢出
      */
-    private UCrop.Options setCropOption(){
-        UCrop.Options options = new UCrop.Options();
-        options.setHideBottomControls(true);
-        options.setFreeStyleCropEnabled(false);
-        options.setToolbarColor(getResources().getColor(R.color.colorPrimary));
-        return options;
-    }
+    private static class ScanImageHandler extends Handler{
+        private  WeakReference<ActivitySelectImage> mActivity;
 
-    /**
-     * 开始剪裁图片
-     * @param path 图片路径
-     */
-    private void startCropImage(String path){
-        Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "SampleCropImage.jpeg"));
-        Uri srcUri = Uri.parse("file://"+path);
-        UCrop.of(srcUri, destinationUri)
-                .withAspectRatio(1, 1)
-                .withOptions(setCropOption())
-                .start((Activity) mContext);
-    }
+        public ScanImageHandler(ActivitySelectImage activity){
+            mActivity = new WeakReference<ActivitySelectImage>(activity);
+        }
 
-    private void initFresco(){
-        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
-                .setBitmapsConfig( Bitmap.Config.RGB_565)
-                .build();
-        Fresco.initialize(this, imagePipelineConfig);
-    }
-
-    private Handler mHanlder = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            final ActivitySelectImage actiivty = mActivity.get();
+            if (actiivty == null){
+                return;
+            }
             if ( msg.what == HANDLER_REFRESH_LIST_EVENT ){
-                if (mAllFolder.size() > 0){
-                    mFolderName.setText(mAllFolder.get(0).getFolderName());
-                    mAdapterGalleryImages.setFolderInfo(mAllFolder.get(0));
-                }else {
-                    //处理没有图片时的状态
+                if (actiivty.mAllFolder.size() > 0){
+                    actiivty.mFolderName.setText(actiivty.mAllFolder.get(0).getFolderName());
+                    actiivty.mAdapterGalleryImages.setFolderInfo(actiivty.mAllFolder.get(0));
                 }
-                mAdapterGalleryFolder.setmAllFolder(mAllFolder);
-                mAdapterGalleryImages.notifyDataSetChanged();
-                mAdapterGalleryFolder.notifyDataSetChanged();
+                actiivty.mAdapterGalleryFolder.setmAllFolder(actiivty.mAllFolder);
+                actiivty.mAdapterGalleryImages.notifyDataSetChanged();
+                actiivty.mAdapterGalleryFolder.notifyDataSetChanged();
             }
         }
-    };
+    }
 }
