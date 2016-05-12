@@ -9,6 +9,10 @@
     <color name="cropToolBar">#696969</color>
     <color name="folderLayer">#000000</color>
     <color name="action_bar_bg">#ffffff</color>
+    <color name="toolbar_background">#ffffff</color>
 
+
+    <color name="actionbar_title_text">#333333</color>
+    <color name="actionbar_title_text_prs">#000000</color>
 
 </resources>
