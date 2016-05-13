@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="VsTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:actionBarStyle">@style/Theme.AppCompat.NoActionBar</item>
+        <item name="colorPrimary">@color/toolbar_background</item>
+        <item name="android:windowBackground">@color/toolbar_background</item>
+        <!--<item name="android:homeAsUpIndicator">@drawable/common_actionbar_back</item>-->
+    </style>
+</resources>

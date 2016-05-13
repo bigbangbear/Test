@@ -12,6 +12,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.huibin.yu.imageselect.R;
 
 import vstore.netease.com.ugallery.UGallery;
+import vstore.netease.com.ugallery.activity.ActivityCropImageNew;
 import vstore.netease.com.ugallery.view.GestureImageView;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_open_crop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UGallery.takePhoto(MainActivity.this);
+//                UGallery.takePhoto(MainActivity.this);
+                ActivityCropImageNew.startActivity(MainActivity.this, mImageUri);
             }
         });
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode != RESULT_OK) {
             return;
         }
+
 
         if (requestCode == UGallery.SELECT_PHOTO){
             //mImageUri = Uri.parse("file://"+path);

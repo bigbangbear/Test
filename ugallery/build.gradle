@@ -26,5 +26,4 @@ dependencies {
     compile 'com.android.support:design:23.3.0'
     compile 'com.facebook.fresco:fresco:0.10.0'
     compile 'com.facebook.fresco:animated-gif:0.10.0'
-    compile project(':ucrop')
 }
