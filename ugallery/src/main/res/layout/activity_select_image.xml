@@ -4,6 +4,13 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ly_bottom"
+        />
+
     <RelativeLayout
         android:id="@+id/ly_bottom"
         android:layout_width="match_parent"
@@ -12,12 +19,12 @@
         android:gravity="center_vertical"
         android:background="@color/selectToolBar"
         >
-
         <TextView
             android:id="@+id/folder_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
             android:padding="10dp"
             />
 
@@ -42,12 +49,6 @@
             />
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/ly_bottom"
-        />
 
     <LinearLayout
         android:id="@+id/ly_folder_layer"
@@ -55,9 +56,11 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:layout_above="@id/ly_bottom"
+        android:background="#66333333"
         >
 
         <android.support.v7.widget.RecyclerView
+            android:layout_marginTop="60dp"
             android:id="@+id/recyclerview_folder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
