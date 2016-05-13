@@ -12,16 +12,16 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import com.yalantis.ucrop.callback.BitmapLoadCallback;
-import com.yalantis.ucrop.util.BitmapLoadUtils;
-import com.yalantis.ucrop.view.GestureCropImageView;
+import vstore.netease.ucrop.callback.BitmapLoadCallback;
+import vstore.netease.ucrop.util.BitmapLoadUtils;
+import vstore.netease.ucrop.view.GestureCropImageView;
 
 /**
  * 支持手势缩放、放大、平移的ImageView
  * @author yuhuibin
  * @date 2016-05-06
  */
-public class GestureImageView extends GestureCropImageView{
+public class GestureImageView extends GestureCropImageView {
     private static final String TAG = "GestureImageView";
     private Uri mImageUri ;
 
