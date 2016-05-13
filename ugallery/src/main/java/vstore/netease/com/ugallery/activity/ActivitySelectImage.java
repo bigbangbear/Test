@@ -212,7 +212,6 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
             new AnimationUtil(getApplicationContext(), R.anim.translate_down)
                     .setLinearInterpolator().startAnimation(mLinearLayoutFolder);
             mLinearLayoutFolder.setVisibility(View.GONE);
-
         }else {
             mLinearLayoutFolder.setVisibility(View.VISIBLE);
             new AnimationUtil(getApplicationContext(), R.anim.translate_up_current)
@@ -293,11 +292,9 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
             @Override
             public void run() {
                 super.run();
-
                 mAllFolder.clear();
                 mAllFolder = PhotoTools.getAllPhotoFolder(mContext, null);
                 //mSelectPhoto.clear();
-
                 refreshAdapter();
             }
         }.start();

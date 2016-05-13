@@ -38,6 +38,33 @@ public class GestureImageView extends GestureCropImageView {
     }
 
     /**
+     * 为减少内存的占有，以宽高的最大值为maxBitmapSize
+     * @param imageUri
+     * @throws Exception
+     */
+    public void setImageUri(@NonNull Uri imageUri) {
+        mImageUri = imageUri;
+        int maxBitmapSize = calculateMaxBitmapSize();
+        BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, imageUri, maxBitmapSize, maxBitmapSize,
+                new BitmapLoadCallback() {
+                    @Override
+                    public void onBitmapLoaded(@NonNull final Bitmap bitmap) {
+                        mBitmapDecoded = true;
+                        setImageBitmap(bitmap);
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Exception bitmapWorkerException) {
+                        Log.e(TAG, "onFailure: setImageUri", bitmapWorkerException);
+                        if (mTransformImageListener != null) {
+                            mTransformImageListener.onLoadFailure(bitmapWorkerException);
+                        }
+                    }
+                });
+        setRotateEnabled(false);
+    }
+
+    /**
      * 处理当没有传入Uri的时候，触摸事件所导致的异常
      * @param event
      * @return
@@ -71,33 +98,6 @@ public class GestureImageView extends GestureCropImageView {
             height = display.getHeight();
         }
         return (int) Math.max(width, height);
-    }
-
-    /**
-     * 为减少内存的占有，以宽高的最大值为maxBitmapSize
-     * @param imageUri
-     * @throws Exception
-     */
-    public void setImageUri(@NonNull Uri imageUri) {
-        mImageUri = imageUri;
-        int maxBitmapSize = calculateMaxBitmapSize();
-        BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, imageUri, maxBitmapSize, maxBitmapSize,
-                new BitmapLoadCallback() {
-                    @Override
-                    public void onBitmapLoaded(@NonNull final Bitmap bitmap) {
-                        mBitmapDecoded = true;
-                        setImageBitmap(bitmap);
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Exception bitmapWorkerException) {
-                        Log.e(TAG, "onFailure: setImageUri", bitmapWorkerException);
-                        if (mTransformImageListener != null) {
-                            mTransformImageListener.onLoadFailure(bitmapWorkerException);
-                        }
-                    }
-                });
-        setRotateEnabled(false);
     }
 
     /**

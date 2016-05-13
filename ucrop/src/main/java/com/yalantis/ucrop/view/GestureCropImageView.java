@@ -2,6 +2,7 @@ package com.yalantis.ucrop.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -133,6 +134,9 @@ public class GestureCropImageView extends CropImageView {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.i("yhb->滑动前",e1.getAxisValue(MotionEvent.AXIS_X)+"");
+            Log.i("yhb->滑动后",e2.getAxisValue(MotionEvent.AXIS_X)+"");
+            Log.i("yhb->",distanceX+"");
             postTranslate(-distanceX, -distanceY);
             return true;
         }
