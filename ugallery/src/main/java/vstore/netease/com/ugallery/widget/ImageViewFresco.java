@@ -60,7 +60,7 @@ public class ImageViewFresco extends SimpleDraweeView{
                 .setFadeDuration(300)
                 .setPlaceholderImage(progressDrawable)
                 .setFailureImage(progressDrawable)
-                .setProgressBarImage(new ProgressBarDrawable())
+//                .setProgressBarImage(new ProgressBarDrawable())
                 .build();
         setHierarchy(hierarchy);
 
