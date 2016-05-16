@@ -84,7 +84,7 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
     public static void startActivityForMutilImage(Context context){
         mIsSingleImagePick = false;
         Intent intent = new Intent(context, ActivitySelectImage.class);
-        ( (Activity)context).startActivity(intent);
+        ( (Activity)context).startActivityForResult(intent, UGallery.SELECT_MUTIL_PHOTO);
     }
 
     @Override
@@ -131,14 +131,14 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
         }
 
         if (requestCode == UGallery.CROP_IMAGE){
-            Uri uri = UGallery.getData(data);
+            Uri uri = UGallery.getSingleImage(data);
             returnSingleImage(uri);
         }
 
         if (requestCode == UGallery.TAKE_PHOTO){
             getPhotos();
             if (mIsSingleImagePick) {
-                Uri uri = UGallery.getData(data);
+                Uri uri = UGallery.getSingleImage(data);
                 if (mIsCrop) {
                     cropImage(uri);
                     return;
@@ -195,6 +195,17 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
     private void returnSingleImage(Uri uri){
         Intent intent = new Intent();
         intent.putExtra(UGallery.PATH, uri.getPath());
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    private void returnMutilImage(ArrayList<PhotoInfo> uri){
+        Intent intent = new Intent();
+        ArrayList<String> listUri = new ArrayList<>();
+        for (int i=0; i<mSelectPhoto.size(); i++){
+            listUri.add(mSelectPhoto.get(i).getPhotoPath().getPath());
+        }
+        intent.putStringArrayListExtra(UGallery.PATH, listUri);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -259,7 +270,7 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
             @Override
             public void onClick(View view) {
                 if (mSelectPhoto.size() > 0){
-                    ActivityPreviewImage.startActivity(mContext, mSelectPhoto);
+                    returnMutilImage(mSelectPhoto);
                 }
             }
         });
@@ -294,7 +305,6 @@ public class ActivitySelectImage extends ActivityUGalleryBase implements  Folder
                 super.run();
                 mAllFolder.clear();
                 mAllFolder = PhotoTools.getAllPhotoFolder(mContext, null);
-                //mSelectPhoto.clear();
                 refreshAdapter();
             }
         }.start();

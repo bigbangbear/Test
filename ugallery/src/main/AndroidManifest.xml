@@ -13,7 +13,6 @@
         <activity android:name=".activity.ActivityTakePhotos"/>
         <activity android:name=".activity.ActivityCropImage"/>
         <activity android:name=".activity.ActivityPreviewImage"/>
-        <activity android:name=".activity.ActivityCropImageNew"/>
 
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>

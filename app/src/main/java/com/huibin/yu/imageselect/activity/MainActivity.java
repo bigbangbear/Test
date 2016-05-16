@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -11,8 +12,9 @@ import android.widget.TextView;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.huibin.yu.imageselect.R;
 
+import java.util.ArrayList;
+
 import vstore.netease.com.ugallery.UGallery;
-import vstore.netease.com.ugallery.activity.ActivityCropImageNew;
 import vstore.netease.com.ugallery.view.GestureImageView;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,8 +54,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_open_crop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                UGallery.takePhoto(MainActivity.this);
-                ActivityCropImageNew.startActivity(MainActivity.this, mImageUri);
+                UGallery.selectMutipleImage(MainActivity.this);
             }
         });
 
@@ -70,19 +71,26 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == UGallery.SELECT_PHOTO){
             //mImageUri = Uri.parse("file://"+path);
-            mImage.setmImagePath(UGallery.getData(data));
+            mImage.setmImagePath(UGallery.getSingleImage(data));
 
         }
 
         if (requestCode == UGallery.CROP_IMAGE){
-            mImage.setmImagePath(UGallery.getData(data));
+            mImage.setmImagePath(UGallery.getSingleImage(data));
         }
         if (requestCode == UGallery.TAKE_PHOTO){
-            mImage.setmImagePath(UGallery.getData(data));
+            mImage.setmImagePath(UGallery.getSingleImage(data));
         }
 
         if (requestCode == UGallery.SELECT_PHOTO){
 //            mImageUri = Uri.parse("file://"+path);
+        }
+
+        if (requestCode == UGallery.SELECT_MUTIL_PHOTO){
+            ArrayList<Uri> uriArrayList = UGallery.getMutilImage(data);
+            for (Uri uri:uriArrayList){
+                Log.i("uri=", uri.toString());
+            }
         }
 
     }

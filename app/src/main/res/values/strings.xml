@@ -1,7 +1,4 @@
 <resources>
     <string name="app_name">ImageSelect</string>
     <string name="all_photo">所有</string>
-    <string name="waiting">等待</string>
-    <string name="saving">保存</string>
-
 </resources>

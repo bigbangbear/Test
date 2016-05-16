@@ -71,7 +71,7 @@ public class ActivityTakePhotos extends Activity{
         }
 
         if (requestCode == UGallery.CROP_IMAGE){
-            Uri uri = UGallery.getData(data);
+            Uri uri = UGallery.getSingleImage(data);
             returnSingleImage(uri);
         }
 

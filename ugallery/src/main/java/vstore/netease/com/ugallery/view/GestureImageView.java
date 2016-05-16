@@ -12,9 +12,10 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import vstore.netease.ucrop.callback.BitmapLoadCallback;
-import vstore.netease.ucrop.util.BitmapLoadUtils;
-import vstore.netease.ucrop.view.GestureCropImageView;
+import com.yalantis.ucrop.callback.BitmapLoadCallback;
+import com.yalantis.ucrop.util.BitmapLoadUtils;
+import com.yalantis.ucrop.view.GestureCropImageView;
+
 
 /**
  * 支持手势缩放、放大、平移的ImageView
