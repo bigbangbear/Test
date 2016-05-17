@@ -20,8 +20,7 @@ import vstore.netease.com.ugallery.view.GestureImageView;
 public class MainActivity extends AppCompatActivity {
     private TextView openSingleImage;
     private GestureImageView mImage;
-    private Uri mImageUri = null;
-    private LinearLayout mLy;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,10 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-
-
-
-        mLy = (LinearLayout)findViewById(R.id.ly);
         mImage = (GestureImageView)findViewById(R.id.image);
 
         openSingleImage = (TextView)findViewById(R.id.bt_open_single);
@@ -42,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
                 UGallery.selectSingleImageCrop(MainActivity.this);
             }
         });
-
 
         findViewById(R.id.bt_open_mutil).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_open_crop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UGallery.selectMutipleImage(MainActivity.this);
+                UGallery.selectSingleImageCrop(MainActivity.this);
             }
         });
 
@@ -70,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (requestCode == UGallery.SELECT_PHOTO){
-            //mImageUri = Uri.parse("file://"+path);
             mImage.setmImagePath(UGallery.getSingleImage(data));
 
         }
@@ -80,10 +73,6 @@ public class MainActivity extends AppCompatActivity {
         }
         if (requestCode == UGallery.TAKE_PHOTO){
             mImage.setmImagePath(UGallery.getSingleImage(data));
-        }
-
-        if (requestCode == UGallery.SELECT_PHOTO){
-//            mImageUri = Uri.parse("file://"+path);
         }
 
         if (requestCode == UGallery.SELECT_MUTIL_PHOTO){

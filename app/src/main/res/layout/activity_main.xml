@@ -16,8 +16,8 @@
         android:id="@+id/bt_open_single"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="openSingleImage"
+        android:layout_margin="10dp"
+        android:text="选择单张图像"
         />
 
     <TextView
@@ -25,14 +25,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="openMutiImage"
+        android:text="选择多张图像"
         />
     <TextView
         android:id="@+id/bt_open_crop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="cropImage"
+        android:text="选择单张图像并裁剪"
         />
 
     <vstore.netease.com.ugallery.view.GestureImageView
