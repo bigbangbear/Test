@@ -12,6 +12,14 @@
         />
 
 
+    <View
+        android:id="@+id/divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#dedede"
+        android:layout_above="@id/ly_bottom"
+        />
+
     <RelativeLayout
         android:id="@+id/ly_bottom"
         android:layout_width="match_parent"
@@ -20,13 +28,7 @@
         android:gravity="center_vertical"
         android:background="@color/selectToolBar"
         >
-        <View
-            android:id="@+id/divider_line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#dedede"
-            android:layout_alignParentTop="true"
-            />
+
         <TextView
             android:id="@+id/folder_name"
             android:layout_width="wrap_content"
