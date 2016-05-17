@@ -4,15 +4,15 @@
     <application android:allowBackup="true"
                  android:label="@string/app_name"
         >
-        <activity android:name=".activity.ActivitySelectImage"
+        <activity android:name="vstore.com.neteaseyx.ugallery.activity.ActivitySelectImage"
                   android:theme="@style/VsTheme"
             />
         <activity android:name="com.yalantis.ucrop.UCropActivity"
                   android:screenOrientation="portrait"
                   android:theme="@style/VsTheme"/>
-        <activity android:name=".activity.ActivityTakePhotos"/>
-        <activity android:name=".activity.ActivityCropImage"/>
-        <activity android:name=".activity.ActivityPreviewImage"/>
+        <activity android:name="vstore.com.neteaseyx.ugallery.activity.ActivityTakePhotos"/>
+        <activity android:name="vstore.com.neteaseyx.ugallery.activity.ActivityCropImage"/>
+        <activity android:name="vstore.com.neteaseyx.ugallery.activity.ActivityPreviewImage"/>
 
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>

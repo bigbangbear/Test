@@ -9,7 +9,7 @@
               android:background="@color/white"
     >
 
-    <vstore.netease.com.ugallery.widget.ImageViewFresco
+    <vstore.com.neteaseyx.ugallery.widget.ImageViewFresco
         android:id="@+id/image"
         android:layout_width="50dp"
         android:layout_height="50dp"
